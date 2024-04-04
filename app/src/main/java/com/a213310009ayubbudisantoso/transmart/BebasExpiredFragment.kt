@@ -100,13 +100,14 @@ class BebasExpiredFragment : Fragment() {
                 itmEditText.text = "gula"
                 statusEditText.text = "Returnable"
                 if (s.isNullOrEmpty()) {
-                    itmEditText.text = ""
-                    statusEditText.text = ""
+                    itmEditText.text = "data not yet available"
+                    statusEditText.text = "data not yet available"
                 }
             }
         })
     }
 
+    //Scann kode barng
     private fun scanner() {
         val options = ScanOptions()
         options.setPrompt("Volume up to Flash on")
@@ -124,6 +125,7 @@ class BebasExpiredFragment : Fragment() {
         }
     }
 
+    //scann nomer gondala
     private fun scanner2() {
         val options = ScanOptions()
         options.setPrompt("Volume up to Flash on")
@@ -141,37 +143,40 @@ class BebasExpiredFragment : Fragment() {
         }
     }
 
+    //konfrimasi data simpan
     private fun showDataPopup() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_data_popup, null)
+
+        // Set nilai ke TextView di dialogView
+        dialogView.findViewById<TextView>(R.id.noGondalaValue).text = noGondalaEditText.text
+        dialogView.findViewById<TextView>(R.id.kodeBarangValue).text = kodeEditText.text
+        dialogView.findViewById<TextView>(R.id.tanggalExpiredValue).text = tglEditText.text
+        dialogView.findViewById<TextView>(R.id.namaItemValue).text = itmEditText.text
+        dialogView.findViewById<TextView>(R.id.statusItemValue).text = statusEditText.text
+        dialogView.findViewById<TextView>(R.id.jumlahValue).text = jumEditText.text
+        dialogView.findViewById<TextView>(R.id.planeValue).text = planeEditText.selectedItem.toString()
+
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Bebas Expired Data")
-
-        val dataStr = "No Gondala: ${noGondalaEditText.text}\n" +
-                "Kode: ${kodeEditText.text}\n" +
-                "Tgl: ${tglEditText.text}\n" +
-                "Item: ${itmEditText.text}\n" +
-                "Status: ${statusEditText.text}\n" +
-                "Jumlah: ${jumEditText.text}\n" +
-                "Plane: ${planeEditText.selectedItem}\n"
-
-        builder.setMessage(dataStr)
-        builder.setPositiveButton("OK") { dialog, _ ->
-            dialog.dismiss()
-            noGondalaEditText.setText("")
-            kodeEditText.setText("")
-            tglEditText.setText("")
-            itmEditText.setText("")
-            statusEditText.setText("")
-            jumEditText.setText("")
-        }
-
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.dismiss()
-        }
+            .setTitle("Bebas Expired Data")
+            .setView(dialogView)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+                Toast.makeText(context, "Data berhasil tersimpan", Toast.LENGTH_SHORT).show()
+                // Reset EditText
+                noGondalaEditText.setText("")
+                kodeEditText.setText("")
+                tglEditText.setText("")
+                itmEditText.setText("data not yet available")
+                statusEditText.setText("data not yet available")
+                jumEditText.setText("")
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
 
         val dialog = builder.create()
         dialog.show()
     }
-
     private fun showDatePickerDialog() {
         val dateSetListener =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
