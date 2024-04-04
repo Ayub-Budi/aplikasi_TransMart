@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Trans Mart</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="plane">
+        <item>Pilih Plane</item>
+        <item>di data</item>
+        <item>di tarik</item>
+    </string-array>
+
+</resources>
