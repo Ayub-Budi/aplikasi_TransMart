@@ -6,6 +6,7 @@
     tools:context=".BebasExpiredFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -22,7 +23,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Inputan Barang"
+                    android:text="Input Barang"
                     android:textSize="28dp"
                     android:textColor="@color/blackColor"/>
 
@@ -102,6 +103,54 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:layout_marginTop="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nama Item"
+                        android:fontFamily="@font/poppinsregular"
+                        android:textColor="@color/blackColor"/>
+
+                    <TextView
+                        android:id="@+id/itm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="data not yet available"
+                        android:fontFamily="@font/poppinsregular"
+                        android:textColor="@color/gray"
+                        android:background="@drawable/input_shape"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/blackColor">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Status Item : "
+                        android:fontFamily="@font/poppinsregular"
+                        android:textColor="@color/blackColor"/>
+
+                    <TextView
+                        android:id="@+id/status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:text="data not yet available"
+                        android:fontFamily="@font/poppinsregular"
+                        android:textColor="@color/gray"
+                        android:background="@drawable/input_shape"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_marginTop="10dp"
                     android:padding="3dp">
                     <TextView
@@ -123,7 +172,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="Tanggal Expired"
-                            android:inputType="date"/>
+                            android:inputType="none"
+                            android:focusable="false"/>
 
                         <ImageButton
                             android:id="@+id/btnTgl"
@@ -189,56 +239,6 @@
 
                     </LinearLayout>
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="10dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nama Item"
-                        android:fontFamily="@font/poppinsregular"
-                        android:textColor="@color/blackColor"/>
-
-                    <TextView
-                        android:id="@+id/itm"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="10dp"
-                        android:text="data not yet available"
-                        android:fontFamily="@font/poppinsregular"
-                        android:textColor="@color/gray"
-                        android:background="@drawable/input_shape"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="10dp"
-                    android:textColor="@color/blackColor">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Status Item : "
-                        android:fontFamily="@font/poppinsregular"
-                        android:textColor="@color/blackColor"/>
-
-                    <TextView
-                        android:id="@+id/status"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="10dp"
-                        android:text="data not yet available"
-                        android:fontFamily="@font/poppinsregular"
-                        android:textColor="@color/gray"
-                        android:background="@drawable/input_shape"/>
-
-
-                </LinearLayout>
-
 
                 <Button
                     android:id="@+id/simpan"
