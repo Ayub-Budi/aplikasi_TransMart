@@ -21,9 +21,15 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bebasExpired = view.findViewById<CardView>(R.id.expired)
+        val listBarang = view.findViewById<CardView>(R.id.listBarang)
 
         bebasExpired.setOnClickListener{
             findNavController().navigate(R.id.action_homeFragment_to_bebasExpiredFragment)
+        }
+
+        listBarang.setOnClickListener{
+            findNavController().navigate(R.id.action_homeFragment_to_listFragment)
+
         }
     }
 }

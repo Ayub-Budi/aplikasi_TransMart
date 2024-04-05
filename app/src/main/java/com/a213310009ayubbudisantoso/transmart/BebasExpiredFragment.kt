@@ -8,15 +8,9 @@ import android.view.ViewGroup
 
 import android.app.DatePickerDialog
 import android.text.Editable
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.Toast
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.navigation.fragment.findNavController
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
@@ -36,10 +30,11 @@ class BebasExpiredFragment : Fragment() {
     private lateinit var planeEditText: Spinner
     private lateinit var btnTgl: ImageButton
     private lateinit var calendar: Calendar
+    private lateinit var kembali: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bebas_expired, container, false)
@@ -56,19 +51,29 @@ class BebasExpiredFragment : Fragment() {
         statusEditText = view.findViewById(R.id.status)
         jumEditText = view.findViewById(R.id.jum)
         planeEditText = view.findViewById(R.id.plane)
-
+        // Inisialisasi tombol kembali
+        kembali = view.findViewById(R.id.kembali)
+        // Inisialisasi Tanggal
         btnTgl = view.findViewById(R.id.btnTgl)
+        //Menjalankan Tanggal
         calendar = Calendar.getInstance()
-
+        // Inisialisasi scanner code
         btnScan = view.findViewById(R.id.btnScan)
+        //menjalankan scanner code
         btnScan.setOnClickListener { scanner() }
-
+        // Inisialisasi scanner gondala
         btnScanGondala = view.findViewById(R.id.btnScanGondala)
+        //menjalankan scanner gondala
         btnScanGondala.setOnClickListener { scanner2() }
 
+        //Tombol simpan
         val simpanButton: Button = view.findViewById(R.id.simpan)
         simpanButton.setOnClickListener {
             showDataPopup()
+        }
+
+        kembali.setOnClickListener {
+            findNavController().navigate(R.id.action_bebasExpiredFragment_to_homeFragment)
         }
 
         btnTgl.setOnClickListener {
@@ -162,13 +167,9 @@ class BebasExpiredFragment : Fragment() {
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
                 Toast.makeText(context, "Data berhasil tersimpan", Toast.LENGTH_SHORT).show()
-                // Reset EditText
-                noGondalaEditText.setText("")
-                kodeEditText.setText("")
-                tglEditText.setText("")
-                itmEditText.setText("data not yet available")
-                statusEditText.setText("data not yet available")
-                jumEditText.setText("")
+
+                reset()
+
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
@@ -177,6 +178,17 @@ class BebasExpiredFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
     }
+    // Reset EditText
+    private fun reset() {
+        noGondalaEditText.setText("")
+        kodeEditText.setText("")
+        tglEditText.setText("")
+        itmEditText.setText("data not yet available")
+        statusEditText.setText("data not yet available")
+        jumEditText.setText("")
+    }
+
+    //Tanggal
     private fun showDatePickerDialog() {
         val dateSetListener =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
