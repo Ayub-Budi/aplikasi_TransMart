@@ -7,9 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 
 import android.app.DatePickerDialog
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.NotificationCompat
 import androidx.navigation.fragment.findNavController
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
@@ -42,6 +47,7 @@ class BebasExpiredFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         // Inisialisasi EditText
         noGondalaEditText = view.findViewById(R.id.no_gondala)
@@ -111,6 +117,8 @@ class BebasExpiredFragment : Fragment() {
             }
         })
     }
+
+
 
     //Scann kode barng
     private fun scanner() {
