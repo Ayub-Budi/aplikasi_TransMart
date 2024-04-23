@@ -1,21 +1,28 @@
 package com.a213310009ayubbudisantoso.transmart
 
+import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Editable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
-import android.app.DatePickerDialog
-import android.text.Editable
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.a213310009ayubbudisantoso.transmart.api.model.BebasExpiredModel
+import com.a213310009ayubbudisantoso.transmart.api.services.BebasExpiredService
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import java.util.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
+import java.util.*
 
 class BebasExpiredFragment : Fragment() {
 
@@ -32,18 +39,27 @@ class BebasExpiredFragment : Fragment() {
     private lateinit var calendar: Calendar
     private lateinit var kembali: ImageView
 
+    private lateinit var apiService: BebasExpiredService
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bebas_expired, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Inisialisasi EditText
+        // Initialize Retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://10.40.6.195:3000") // Change with your API base URL
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        apiService = retrofit.create(BebasExpiredService::class.java)
+
+        // Initialize views
         noGondalaEditText = view.findViewById(R.id.no_gondala)
         kodeEditText = view.findViewById(R.id.kode)
         tglEditText = view.findViewById(R.id.tgl)
@@ -51,56 +67,31 @@ class BebasExpiredFragment : Fragment() {
         statusEditText = view.findViewById(R.id.status)
         jumEditText = view.findViewById(R.id.jum)
         planeEditText = view.findViewById(R.id.plane)
-        // Inisialisasi tombol kembali
         kembali = view.findViewById(R.id.kembali)
-        // Inisialisasi Tanggal
         btnTgl = view.findViewById(R.id.btnTgl)
-        //Menjalankan Tanggal
         calendar = Calendar.getInstance()
-        // Inisialisasi scanner code
         btnScan = view.findViewById(R.id.btnScan)
-        //menjalankan scanner code
-        btnScan.setOnClickListener { scanner() }
-        // Inisialisasi scanner gondala
         btnScanGondala = view.findViewById(R.id.btnScanGondala)
-        //menjalankan scanner gondala
+
+        // Button listeners
+        btnScan.setOnClickListener { scanner() }
         btnScanGondala.setOnClickListener { scanner2() }
+        btnTgl.setOnClickListener { showDatePickerDialog() }
+        tglEditText.setOnClickListener { showDatePickerDialog() }
+        kembali.setOnClickListener { findNavController().navigate(R.id.action_bebasExpiredFragment_to_homeFragment) }
 
-        //Tombol simpan
-        val simpanButton: Button = view.findViewById(R.id.simpan)
-        simpanButton.setOnClickListener {
-            showDataPopup()
-        }
-
-        kembali.setOnClickListener {
-            findNavController().navigate(R.id.action_bebasExpiredFragment_to_homeFragment)
-        }
-
-        btnTgl.setOnClickListener {
-            showDatePickerDialog()
-        }
-        tglEditText.setOnClickListener {
-            showDatePickerDialog()
-        }
-
-        // Pastikan R.array.plane ada di dalam folder res/values
+        // Spinner adapter
         val adapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.plane,
             android.R.layout.simple_spinner_item
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        planeEditText.setAdapter(adapter);
+        planeEditText.adapter = adapter
 
         kodeEditText.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                // Tidak diperlukan untuk operasi ini
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // Tidak diperlukan untuk operasi ini
-            }
-
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 itmEditText.text = "gula"
                 statusEditText.text = "Returnable"
@@ -110,45 +101,46 @@ class BebasExpiredFragment : Fragment() {
                 }
             }
         })
+
+        // Save button click listener
+        val simpanButton: Button = view.findViewById(R.id.simpan)
+        simpanButton.setOnClickListener { simpan() }
     }
 
-    //Scann kode barng
     private fun scanner() {
         val options = ScanOptions()
         options.setPrompt("Volume up to Flash on")
         options.setBeepEnabled(true)
         options.setOrientationLocked(true)
-        // Pastikan StartScan adalah kelas yang benar untuk mengambil hasil scan barcode
         options.captureActivity = StartScan::class.java
         launcher.launch(options)
     }
 
     private var launcher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         if (result.contents != null) {
-            // Set the result contents to the input text with ID "kode"
             kodeEditText.setText(result.contents)
         }
     }
 
-    //scann nomer gondala
     private fun scanner2() {
         val options = ScanOptions()
         options.setPrompt("Volume up to Flash on")
         options.setBeepEnabled(true)
         options.setOrientationLocked(true)
-        // Pastikan StartScan adalah kelas yang benar untuk mengambil hasil scan barcode
         options.captureActivity = StartScan::class.java
         launcher2.launch(options)
     }
 
     private var launcher2 = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         if (result.contents != null) {
-            // Set the result contents to the input text with ID "kode"
             noGondalaEditText.setText(result.contents)
         }
     }
 
-    //konfrimasi data simpan
+    private fun simpan() {
+        showDataPopup()
+    }
+
     private fun showDataPopup() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_data_popup, null)
 
@@ -166,10 +158,7 @@ class BebasExpiredFragment : Fragment() {
             .setView(dialogView)
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
-                Toast.makeText(context, "Data berhasil tersimpan", Toast.LENGTH_SHORT).show()
-
-                reset()
-
+                sendDataToApi()
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
@@ -178,7 +167,47 @@ class BebasExpiredFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
     }
-    // Reset EditText
+
+
+    private fun sendDataToApi() {
+        val data = BebasExpiredModel().apply {
+            gondalaNumber = noGondalaEditText.text.toString()
+            itemCode = kodeEditText.text.toString()
+            itemName = itmEditText.text.toString()
+            statusItem = statusEditText.text.toString()
+            expiredDate = tglEditText.text.toString() // Keep as string
+            itemAmount = jumEditText.text.toString().toInt()
+            iconePlane = planeEditText.selectedItem.toString()
+            createBy = "ayub"
+            updateBy = "ayub"
+            storecode = 123
+        }
+
+        apiService.postData(data).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Data berhasil tersimpan", Toast.LENGTH_SHORT).show()
+                    reset()
+                } else {
+                    Toast.makeText(context, "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
+
+                    val errorMessage = "Gagal menyimpan data. Kode status: ${response.code()}, Pesan: ${response.message()}"
+                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                    Log.e("API_CALL_ERROR", errorMessage)
+
+
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Toast.makeText(context, "Terjadi kesalahan: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("API_CALL_ERROR", "Terjadi kesalahan: ${t.message}", t)
+
+            }
+        })
+    }
+
+
     private fun reset() {
         noGondalaEditText.setText("")
         kodeEditText.setText("")
@@ -188,15 +217,13 @@ class BebasExpiredFragment : Fragment() {
         jumEditText.setText("")
     }
 
-    //Tanggal
     private fun showDatePickerDialog() {
-        val dateSetListener =
-            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                updateDateInView()
-            }
+        val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, monthOfYear)
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            updateDateInView()
+        }
 
         DatePickerDialog(
             requireContext(), dateSetListener,
@@ -207,9 +234,8 @@ class BebasExpiredFragment : Fragment() {
     }
 
     private fun updateDateInView() {
-        val myFormat = "dd/MM/yyyy" // Tanggal format
+        val myFormat = "dd/MM/yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         tglEditText.setText(sdf.format(calendar.time))
     }
-
 }
