@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
+import okhttp3.*
+import java.io.IOException
 
 class LoginFragment : Fragment() {
 
@@ -29,13 +31,53 @@ class LoginFragment : Fragment() {
         val btnLogin = view.findViewById<Button>(R.id.btn_login)
 
         btnLogin.setOnClickListener {
-            if (username.text.toString().contains("admin") && password.text.toString().contains("admin")){
-                Toast.makeText(context, "login berhasil", Toast.LENGTH_SHORT).show()
-                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-            }else{
-                Toast.makeText(context, "Username atau password salah", Toast.LENGTH_SHORT).show()
+            val usernameInput = username.text.toString()
+            val passwordInput = password.text.toString()
 
-            }
+            // Kirim permintaan ke server untuk proses autentikasi
+            authenticateUser(usernameInput, passwordInput)
         }
+    }
+
+    private fun authenticateUser(username: String, password: String) {
+        // Ganti BASE_URL dengan URL API Anda
+        val BASE_URL = "https://hrms.transretail.co.id"
+
+        val client = OkHttpClient()
+
+        val requestBody = FormBody.Builder()
+            .add("username", username)
+            .add("password", password)
+            .build()
+
+        val request = Request.Builder()
+            .url(BASE_URL + "login")
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Tangani kegagalan koneksi
+                activity?.runOnUiThread {
+                    Toast.makeText(context, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseData = response.body?.string()
+
+                // Proses respons dari server
+                activity?.runOnUiThread {
+                    if (response.isSuccessful) {
+                        // Berhasil login
+                        Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
+                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    } else {
+                        // Gagal login
+                        Toast.makeText(context, "Username atau password salah", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
     }
 }

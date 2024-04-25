@@ -53,7 +53,7 @@ class BebasExpiredFragment : Fragment() {
 
         // Initialize Retrofit
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.40.6.195:3000") // Change with your API base URL
+            .baseUrl("http://192.168.227.248:3000") // Change with your API base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
