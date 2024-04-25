@@ -6,6 +6,6 @@ class LoginModel {
     var user: String? = null
 
     @SerializedName("passwd")
-    var passwd: String? = null
+    var pswd: String? = null
 
 }
