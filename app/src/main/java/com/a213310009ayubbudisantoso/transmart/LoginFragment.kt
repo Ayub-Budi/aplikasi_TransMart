@@ -1,5 +1,6 @@
 package com.a213310009ayubbudisantoso.transmart
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,16 +13,16 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
 import java.io.IOException
-import java.security.cert.X509Certificate
-import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
+import java.security.cert.X509Certificate
 
 class LoginFragment : Fragment() {
 
-    private val okHttpClient: OkHttpClient by lazy {
+    private val httpClient: OkHttpClient by lazy {
         val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
             override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
             override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
@@ -35,9 +36,16 @@ class LoginFragment : Fragment() {
 
         OkHttpClient.Builder()
             .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-            .hostnameVerifier(HostnameVerifier { _, _ -> true })
+            .hostnameVerifier { _, _ -> true }
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .build()
+    }
+
+    private fun saveResponseToSharedPreferences(responseJson: String) {
+        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("response_json", responseJson)
+        editor.apply()
     }
 
     override fun onCreateView(
@@ -62,27 +70,43 @@ class LoginFragment : Fragment() {
                 val requestBody = MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("username", user)
-                    .addFormDataPart("password", pass)
+                    .addFormDataPart("passwd", pass)
                     .build()
 
+
+                Log.d("ini hit usr & passwd", "user ${user} & pass ${pass}")
+
+
                 val request = Request.Builder()
-                    .url("https://hrms.transretail.co.id/") // Ganti dengan URL endpoint yang sesuai
+                    .url("https://hrms.transretail.co.id/aso/checklogin.php")
                     .post(requestBody)
                     .build()
 
-                okHttpClient.newCall(request).enqueue(object : Callback {
+                Log.d("ini hit api", "${request}")
+
+
+                httpClient.newCall(request).enqueue(object : Callback {
                     override fun onResponse(call: Call, response: Response) {
-                        if (response.isSuccessful) {
-                            // Handle successful response
-                            val responseBody = response.body?.string()
-                            Log.d("responseBody", "${responseBody}")
-                            // Tambahkan log atau proses selanjutnya sesuai kebutuhan
-                            activity?.runOnUiThread {
-                                Toast.makeText(context, "Login berhasil sebagai", Toast.LENGTH_SHORT).show()
-                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                        val responseBody = response.body?.string() // Baca konten respons
+                        if (response.isSuccessful && responseBody != null) {
+                            val jsonResponse = JSONObject(responseBody)
+                            val error = jsonResponse.getBoolean("error")
+                            if (!error) {
+                                // Gunakan responseBody yang telah dibaca sebelumnya
+                                saveResponseToSharedPreferences(responseBody)
+                                // Jika tidak ada kesalahan, lanjutkan dengan tindakan setelah login berhasil
+                                activity?.runOnUiThread {
+                                    Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
+                                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                                }
+                            } else {
+                                // Jika ada kesalahan, tampilkan pesan kesalahan dari respons API
+                                val errorMsg = jsonResponse.getString("error_msg")
+                                activity?.runOnUiThread {
+                                    Toast.makeText(context, "Login Failed : $errorMsg", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         } else {
-                            // Handle unsuccessful response
                             Log.e("API_CALL_ERROR", "Error: ${response.code}")
                             activity?.runOnUiThread {
                                 Toast.makeText(context, "Gagal login. Kode status: ${response.code}", Toast.LENGTH_SHORT).show()
@@ -91,7 +115,6 @@ class LoginFragment : Fragment() {
                     }
 
                     override fun onFailure(call: Call, e: IOException) {
-                        // Handle failure
                         Log.e("API_CALL_ERROR", "Failed to execute request", e)
                         activity?.runOnUiThread {
                             Toast.makeText(context, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
