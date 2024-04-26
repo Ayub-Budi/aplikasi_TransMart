@@ -2,6 +2,7 @@ package com.a213310009ayubbudisantoso.transmart
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -16,6 +17,9 @@ import com.a213310009ayubbudisantoso.transmart.api.services.BebasExpiredService
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
+import android.content.SharedPreferences
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,6 +30,8 @@ import java.util.*
 
 class BebasExpiredFragment : Fragment() {
 
+    private var createBy: String? = null
+    private var userstorecode: String? = null
     private lateinit var btnScan: ImageButton
     private lateinit var btnScanGondala: ImageButton
     private lateinit var noGondalaEditText: EditText
@@ -53,7 +59,7 @@ class BebasExpiredFragment : Fragment() {
 
         // Initialize Retrofit
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.40.6.195:3000") // Change with your API base URL
+            .baseUrl("http://192.168.227.248:3000") // Change with your API base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -105,6 +111,8 @@ class BebasExpiredFragment : Fragment() {
         // Save button click listener
         val simpanButton: Button = view.findViewById(R.id.simpan)
         simpanButton.setOnClickListener { simpan() }
+
+        displaySavedResponse()
     }
 
     private fun scanner() {
@@ -178,9 +186,10 @@ class BebasExpiredFragment : Fragment() {
             expiredDate = tglEditText.text.toString() // Keep as string
             itemAmount = jumEditText.text.toString().toInt()
             iconePlane = planeEditText.selectedItem.toString()
-            createBy = "ayub"
-            updateBy = "ayub"
-            storecode = 123
+            createBy = this@BebasExpiredFragment.createBy
+            storecode = this@BebasExpiredFragment.userstorecode
+            updateBy = createBy
+
         }
 
         apiService.postData(data).enqueue(object : Callback<Void> {
@@ -237,5 +246,27 @@ class BebasExpiredFragment : Fragment() {
         val myFormat = "dd/MM/yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         tglEditText.setText(sdf.format(calendar.time))
+    }
+
+    //   local stored
+    private fun displaySavedResponse() {
+        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+        val responseJson = sharedPreferences.getString("response_json", "")
+        Log.d("ini hit responseJson", "${responseJson}")
+
+        if (!responseJson.isNullOrEmpty()) {
+            try {
+                val jsonObject = JSONObject(responseJson)
+                val userObject = jsonObject.getJSONObject("user")
+                val userName = userObject.getString("name")
+                val storecode = userObject.getString("locationCode")
+                // Ambil nilai 'name' untuk 'createBy'
+                createBy = userName
+                userstorecode = storecode
+
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
     }
 }

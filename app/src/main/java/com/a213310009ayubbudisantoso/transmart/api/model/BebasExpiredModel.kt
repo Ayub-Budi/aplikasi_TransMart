@@ -32,5 +32,5 @@ class BebasExpiredModel {
     var updateBy: String? = null
 
     @SerializedName("store_code")
-    var storecode: Int? = null
+    var storecode: String? = null
 }
