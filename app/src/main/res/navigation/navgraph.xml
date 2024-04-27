@@ -34,6 +34,9 @@
         <action
             android:id="@+id/action_bebasExpiredFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_bebasExpiredFragment_to_dataExpiredFragment2"
+            app:destination="@id/dataExpiredFragment" />
     </fragment>
     <fragment
         android:id="@+id/listFragment"
@@ -43,5 +46,14 @@
         <action
             android:id="@+id/action_listFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/dataExpiredFragment"
+        android:name="com.a213310009ayubbudisantoso.transmart.DataExpiredFragment"
+        android:label="fragment_data_expired"
+        tools:layout="@layout/fragment_data_expired" >
+        <action
+            android:id="@+id/action_dataExpiredFragment_to_bebasExpiredFragment2"
+            app:destination="@id/bebasExpiredFragment" />
     </fragment>
 </navigation>

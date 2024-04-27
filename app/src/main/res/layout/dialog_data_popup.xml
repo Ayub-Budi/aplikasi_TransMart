@@ -136,25 +136,25 @@
                     android:fontFamily="@font/poppinsregular"/>
             </TableRow>
 
-            <TableRow>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Plane"
-                    android:fontFamily="@font/poppinsregular"/>
+<!--            <TableRow>-->
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Plane"-->
+<!--                    android:fontFamily="@font/poppinsregular"/>-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=":"
-                    android:fontFamily="@font/poppinsregular"/>
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text=":"-->
+<!--                    android:fontFamily="@font/poppinsregular"/>-->
 
-                <TextView
-                    android:id="@+id/planeValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppinsregular"/>
-            </TableRow>
+<!--                <TextView-->
+<!--                    android:id="@+id/planeValue"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:fontFamily="@font/poppinsregular"/>-->
+<!--            </TableRow>-->
 
         </TableLayout>
 
