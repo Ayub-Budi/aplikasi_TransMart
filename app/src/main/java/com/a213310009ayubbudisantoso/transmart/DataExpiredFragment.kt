@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -110,6 +111,29 @@ class DataExpiredFragment : Fragment() {
         // Save button click listener
         val simpanButton: Button = view.findViewById(R.id.simpan)
         simpanButton.setOnClickListener { simpan() }
+        simpanButton.isEnabled = false
+
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val allFieldsNotEmpty = noGondalaEditText.text.isNotEmpty() &&
+                        kodeEditText.text.isNotEmpty() &&
+                        tglEditText.text.isNotEmpty() &&
+                        jumEditText.text.isNotEmpty()
+
+                simpanButton.isEnabled = allFieldsNotEmpty
+            }
+        }
+        
+        noGondalaEditText.addTextChangedListener(textWatcher)
+        kodeEditText.addTextChangedListener(textWatcher)
+        tglEditText.addTextChangedListener(textWatcher)
+        jumEditText.addTextChangedListener(textWatcher)
+
+
 
         displaySavedResponse()
     }
