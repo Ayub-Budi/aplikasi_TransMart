@@ -85,7 +85,7 @@ class DataExpiredFragment : Fragment() {
         btnTgl.setOnClickListener { showDatePickerDialog() }
         tglEditText.setOnClickListener { showDatePickerDialog() }
         kembali.setOnClickListener { findNavController().navigate(R.id.action_dataExpiredFragment_to_bebasExpiredFragment2) }
-        
+
 //        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 //        planeEditText.adapter = adapter
 
