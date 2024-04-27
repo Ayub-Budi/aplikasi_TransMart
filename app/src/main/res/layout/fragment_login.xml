@@ -51,6 +51,7 @@
                     android:layout_height="57dp"
                     android:background="@drawable/button_shape"
                     android:backgroundTint="@color/white"
+                    android:paddingLeft="20dp"
                     android:hint="Username"
                     android:inputType="text" />
 
@@ -71,6 +72,7 @@
                     android:layout_height="57dp"
                     android:background="@drawable/button_shape"
                     android:backgroundTint="@color/white"
+                    android:paddingLeft="20dp"
                     android:hint="Password"
                     android:inputType="textPassword" />
 
