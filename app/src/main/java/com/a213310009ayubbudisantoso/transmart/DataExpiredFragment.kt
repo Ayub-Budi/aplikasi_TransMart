@@ -59,7 +59,7 @@ class DataExpiredFragment : Fragment() {
 
         // Initialize Retrofit
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.227.248:3000") // Change with your API base URL
+            .baseUrl("http://192.168.105.248:3000") // Change with your API base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

@@ -17,23 +17,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val navController = findNavController(R.id.fragmentContainerView)
-        if (navController.currentDestination?.id == R.id.homeFragment) {
-            if (doubleBackToExitPressedOnce) {
-                finish()
-            } else {
-                doubleBackToExitPressedOnce = true
-                Toast.makeText(this, "Tekan sekali lagi untuk keluar", Toast.LENGTH_SHORT).show()
-                Handler().postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
-            }
-        } else {
-            super.onBackPressed()
-        }
-
 //        if (navController.currentDestination?.id == R.id.homeFragment) {
-//            onPause()
+//            if (doubleBackToExitPressedOnce) {
+//                finish()
+//            } else {
+//                doubleBackToExitPressedOnce = true
+//                Toast.makeText(this, "Tekan sekali lagi untuk keluar", Toast.LENGTH_SHORT).show()
+//                Handler().postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
+//            }
 //        } else {
 //            super.onBackPressed()
 //        }
+
+        if (navController.currentDestination?.id == R.id.homeFragment) {
+            moveTaskToBack(true)
+            return
+        } else {
+            super.onBackPressed()
+        }
     }
 
 

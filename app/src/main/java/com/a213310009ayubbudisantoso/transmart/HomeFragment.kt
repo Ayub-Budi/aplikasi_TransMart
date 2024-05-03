@@ -1,5 +1,6 @@
 package com.a213310009ayubbudisantoso.transmart
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.navigation.fragment.findNavController
@@ -36,8 +38,33 @@ class HomeFragment : Fragment() {
         val bebasExpired = view.findViewById<CardView>(R.id.expired)
         val listBarang = view.findViewById<CardView>(R.id.listBarang)
 
+        val powerOff = view.findViewById<ImageButton>(R.id.powerOff)
+
         val nameText = view.findViewById<TextView>(R.id.name)
         val storeText = view.findViewById<TextView>(R.id.storeName)
+
+        powerOff.setOnClickListener{
+            // Buat dialog konfirmasi
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Konfirmasi")
+            builder.setMessage("Apakah Anda yakin ingin keluar?")
+
+            // Tombol untuk mengkonfirmasi
+            builder.setPositiveButton("Ya") { dialog, _ ->
+                // Tutup aktivitas
+                requireActivity().finish()
+                dialog.dismiss()
+            }
+
+            // Tombol untuk membatalkan
+            builder.setNegativeButton("Tidak") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            // Tampilkan dialog
+            val dialog = builder.create()
+            dialog.show()
+        }
 
 
         bebasExpired.setOnClickListener{
