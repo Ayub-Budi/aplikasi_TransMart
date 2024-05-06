@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_bebasExpiredFragment_to_dataExpiredFragment2"
             app:destination="@id/dataExpiredFragment" />
+        <action
+            android:id="@+id/action_bebasExpiredFragment_to_tarikBarangFragment"
+            app:destination="@id/tarikBarangFragment" />
     </fragment>
     <fragment
         android:id="@+id/listFragment"
@@ -54,6 +57,15 @@
         tools:layout="@layout/fragment_data_expired" >
         <action
             android:id="@+id/action_dataExpiredFragment_to_bebasExpiredFragment2"
+            app:destination="@id/bebasExpiredFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/tarikBarangFragment"
+        android:name="com.a213310009ayubbudisantoso.transmart.TarikBarangFragment"
+        android:label="fragment_tarik_barang"
+        tools:layout="@layout/fragment_tarik_barang" >
+        <action
+            android:id="@+id/action_tarikBarangFragment_to_bebasExpiredFragment"
             app:destination="@id/bebasExpiredFragment" />
     </fragment>
 </navigation>

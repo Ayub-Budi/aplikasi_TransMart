@@ -25,7 +25,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bebas Expired"
+                    android:text="Mendata Barang Expired"
                     android:textSize="20dp"
                     android:fontFamily="@font/poppinsbold"
                     android:textColor="@color/white"

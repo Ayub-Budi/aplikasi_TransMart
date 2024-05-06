@@ -20,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:orientation="vertical"
-                android:background="@drawable/background_transmart_2"
+                android:background="@drawable/background_transmart_4"
                 android:gravity="center_horizontal">
 
                 <RelativeLayout
@@ -40,7 +40,7 @@
 
                 </RelativeLayout>
 
-                <!--                <TextView-->
+<!--                <TextView-->
 <!--                    android:layout_width="wrap_content"-->
 <!--                    android:layout_height="wrap_content"-->
 <!--                    android:fontFamily="@font/poppinsbold"-->
@@ -82,7 +82,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:fontFamily="@font/poppinssemibold"
-                        android:text="AYUB BUDI SANTOSO"
+                        android:text="Nama"
                         android:textColor="@color/white"
                         android:textSize="20dp" />
 
@@ -104,9 +104,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:fontFamily="@font/poppinssemibold"
-                        android:text="CEMPAKA PUTIH"
+                        android:text="Store"
                         android:textColor="@color/white"
-                        android:textSize="24dp" />
+                        android:textSize="20dp" />
                 </LinearLayout>
             </LinearLayout>
 

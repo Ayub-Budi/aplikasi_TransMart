@@ -40,10 +40,14 @@ class BebasExpiredFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val dataExpired = view.findViewById<CardView>(R.id.data)
+        val menarikExpired = view.findViewById<CardView>(R.id.tarik)
         kembali = view.findViewById(R.id.kembali)
 
         dataExpired.setOnClickListener{
             findNavController().navigate(R.id.action_bebasExpiredFragment_to_dataExpiredFragment2)
+        }
+        menarikExpired.setOnClickListener{
+            findNavController().navigate(R.id.action_bebasExpiredFragment_to_tarikBarangFragment)
         }
 
         kembali.setOnClickListener { findNavController().navigate(R.id.action_bebasExpiredFragment_to_homeFragment) }
