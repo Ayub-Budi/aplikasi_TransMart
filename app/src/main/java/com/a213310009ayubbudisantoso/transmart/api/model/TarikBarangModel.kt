@@ -2,19 +2,24 @@ package com.a213310009ayubbudisantoso.transmart.api.model
 
 import com.google.gson.annotations.SerializedName
 
+
 class TarikBarangModel(
-    @SerializedName("gondala_number") var gondalaNumber: String?,
-    @SerializedName("item_code") var itemCode: String?,
-    @SerializedName("item_name") var itemName: String?,
-    @SerializedName("status_item") var statusItem: String?,
-    @SerializedName("expired_date") var expiredDate: String?,
-    @SerializedName("item_amount") var itemAmount: Int?,
-    @SerializedName("icone_plane") var iconePlane: String?,
-    @SerializedName("create_by") var createBy: String?,
-    @SerializedName("update_by") var updateBy: String?,
-    @SerializedName("store_code") var storeCode: String?
+    @SerializedName("ie_id") var ieId: String?,
+    @SerializedName("ie_store_code") var ieStoreCode: String?,
+    @SerializedName("ie_gondola_no") var ieGondolaNo: String?,
+    @SerializedName("ie_barcode") var ieBarcode: String?,
+    @SerializedName("ie_item_code") var ieItemCode: String?,
+    @SerializedName("ie_item_name") var ieItemName: String?,
+    @SerializedName("ie_item_status") var ieItemStatus: String?,
+    @SerializedName("ie_expired_date") var ieExpiredDate: String?,
+    @SerializedName("ie_qty") var ieQty: Int?,
+    @SerializedName("ie_action") var ieAction: String?,
+    @SerializedName("ie_insert_user") var ieInsertUser: String?,
+    @SerializedName("ie_insert_date") var ieInsertDate: String?,
+    @SerializedName("ie_update_user") var ieUpdateUser: String?,
+    @SerializedName("ie_update_date") var ieUpdateDate: String?
 ) {
     override fun toString(): String {
-        return "TarikBarangModel(gondalaNumber=$gondalaNumber, itemCode=$itemCode, itemName=$itemName, statusItem=$statusItem, expiredDate=$expiredDate, itemAmount=$itemAmount, iconePlane=$iconePlane, createBy=$createBy, updateBy=$updateBy, storeCode=$storeCode)"
+        return "TarikBarangModel(ieId=$ieId, ieStoreCode=$ieStoreCode, ieGondolaNo=$ieGondolaNo, ieBarcode=$ieBarcode, ieItemCode=$ieItemCode, ieItemName=$ieItemName, ieItemStatus=$ieItemStatus, ieExpiredDate=$ieExpiredDate, ieQty=$ieQty, ieAction=$ieAction, ieInsertUser=$ieInsertUser, ieInsertDate=$ieInsertDate, ieUpdateUser=$ieUpdateUser, ieUpdateDate=$ieUpdateDate)"
     }
 }

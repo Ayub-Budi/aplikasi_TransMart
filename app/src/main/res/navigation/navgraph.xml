@@ -67,5 +67,17 @@
         <action
             android:id="@+id/action_tarikBarangFragment_to_bebasExpiredFragment"
             app:destination="@id/bebasExpiredFragment" />
+        <action
+            android:id="@+id/action_tarikBarangFragment_to_detailItemFragment"
+            app:destination="@id/detailItemFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailItemFragment"
+        android:name="com.a213310009ayubbudisantoso.transmart.DetailItemFragment"
+        android:label="fragment_detail_item"
+        tools:layout="@layout/fragment_detail_item" >
+        <action
+            android:id="@+id/action_detailItemFragment_to_tarikBarangFragment"
+            app:destination="@id/tarikBarangFragment" />
     </fragment>
 </navigation>

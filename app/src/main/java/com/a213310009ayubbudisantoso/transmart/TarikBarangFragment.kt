@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.a213310009ayubbudisantoso.transmart.api.adapter.TarikBarangAdapter
@@ -38,6 +40,14 @@ class TarikBarangFragment : Fragment() {
 
         // Inisialisasi adapter RecyclerView
         adapter = TarikBarangAdapter(emptyList())
+
+        adapter.setOnItemClickListener(object : TarikBarangAdapter.OnItemClickListener {
+            override fun onItemClick(item: TarikBarangModel) {
+                // Navigasi ke DetailItemFragment saat item diklik
+                findNavController().navigate(R.id.action_tarikBarangFragment_to_detailItemFragment)
+            }
+        })
+
         recyclerView.adapter = adapter
 
         val retrofit = Retrofit.Builder()
