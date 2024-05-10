@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class TarikBarangFragment : Fragment() {
 
     private lateinit var adapter: TarikBarangAdapter
+    private lateinit var kembali: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +35,9 @@ class TarikBarangFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        kembali = view.findViewById(R.id.kembali)
+        kembali.setOnClickListener { findNavController().navigate(R.id.action_tarikBarangFragment_to_bebasExpiredFragment) }
 
         // Inisialisasi RecyclerView
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
@@ -81,6 +86,7 @@ class TarikBarangFragment : Fragment() {
             }
         })
     }
+
 
 
 

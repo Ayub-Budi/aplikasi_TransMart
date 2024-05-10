@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +23,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DetailItemFragment : Fragment() {
 
+    private lateinit var kembali: ImageView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -32,6 +35,8 @@ class DetailItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        kembali = view.findViewById(R.id.kembali)
+        kembali.setOnClickListener { findNavController().navigate(R.id.action_detailItemFragment_to_tarikBarangFragment) }
 
         // Dapatkan data dari SharedPreferences dengan nama "item"
         val sharedPreferences = requireActivity().getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
