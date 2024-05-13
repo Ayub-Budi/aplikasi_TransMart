@@ -1,36 +1,38 @@
 package com.a213310009ayubbudisantoso.transmart.api.model
 
 import com.google.gson.annotations.SerializedName
-import java.util.Date
 
 class BebasExpiredModel {
-    @SerializedName("gondala_number")
-    var gondalaNumber: String? = null
+    @SerializedName("ie_store_code")
+    var ieStoreCode: String? = null
 
-    @SerializedName("item_code")
-    var itemCode: String? = null
+    @SerializedName("ie_gondola_no")
+    var ieGondolaNo: String? = null
 
-    @SerializedName("item_name")
-    var itemName: String? = null
+    @SerializedName("ie_barcode")
+    var ieBarcode: String? = null
 
-    @SerializedName("status_item")
-    var statusItem: String? = null
+    @SerializedName("ie_item_code")
+    var ieItemCode: String? = null
 
-    @SerializedName("expired_date")
-    var expiredDate: String? = null
+    @SerializedName("ie_item_name")
+    var ieItemName: String? = null
 
-    @SerializedName("item_amount")
-    var itemAmount: Int? = null
+    @SerializedName("ie_item_status")
+    var ieItemStatus: String? = null
 
-    @SerializedName("icone_plane")
-    var iconePlane: String? = null
+    @SerializedName("ie_expired_date")
+    var ieExpiredDate: String? = null
 
-    @SerializedName("create_by")
-    var createBy: String? = null
+    @SerializedName("ie_qty")
+    var ieQty: Int? = null
 
-    @SerializedName("update_by")
-    var updateBy: String? = null
+    @SerializedName("ie_action")
+    var ieAction: String? = null
 
-    @SerializedName("store_code")
-    var storecode: String? = null
+    @SerializedName("ie_insert_user")
+    var ieInsertUser: String? = null
+
+    @SerializedName("ie_update_user")
+    var ieUpdateUser: String? = null
 }

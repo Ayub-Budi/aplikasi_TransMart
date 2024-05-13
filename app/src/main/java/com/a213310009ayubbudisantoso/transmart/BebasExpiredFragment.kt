@@ -1,23 +1,27 @@
 package com.a213310009ayubbudisantoso.transmart
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.a213310009ayubbudisantoso.transmart.api.model.BebasExpiredModel
-import com.a213310009ayubbudisantoso.transmart.api.services.BebasExpiredService
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanIntentResult
-import com.journeyapps.barcodescanner.ScanOptions
-import android.content.SharedPreferences
+import com.a213310009ayubbudisantoso.transmart.api.model.DaasboardExpiredModel
+import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
+import com.a213310009ayubbudisantoso.transmart.api.model.TarikBarangModel
+import com.a213310009ayubbudisantoso.transmart.api.services.DasboardEspiredService
+import com.a213310009ayubbudisantoso.transmart.api.services.TarikBarangService
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
@@ -25,27 +29,14 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
-import java.util.*
 
 class BebasExpiredFragment : Fragment() {
-
-    private var createBy: String? = null
-    private var userstorecode: String? = null
-    private lateinit var btnScan: ImageButton
-    private lateinit var btnScanGondala: ImageButton
-    private lateinit var noGondalaEditText: EditText
-    private lateinit var kodeEditText: EditText
-    private lateinit var tglEditText: EditText
-    private lateinit var itmEditText: TextView
-    private lateinit var statusEditText: TextView
-    private lateinit var jumEditText: EditText
-    private lateinit var planeEditText: Spinner
-    private lateinit var btnTgl: ImageButton
-    private lateinit var calendar: Calendar
     private lateinit var kembali: ImageView
+    private lateinit var pieChart: PieChart
 
-    private lateinit var apiService: BebasExpiredService
+    private var didata = 0f // Variabel untuk radius
+    private var ditarik = 0f // Variabel untuk radius
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,218 +46,174 @@ class BebasExpiredFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        val dataExpired = view.findViewById<CardView>(R.id.data)
+        val menarikExpired = view.findViewById<CardView>(R.id.tarik)
+        kembali = view.findViewById(R.id.kembali)
+        pieChart = view.findViewById(R.id.pieChartDidata)
 
-        // Initialize Retrofit
+
+
+
+        fetchDataFromAPIDashboardModel()
+
+        fetchDataFromAPIListExpired()
+
+//        displaySavedResponse()
+
+        dataExpired.setOnClickListener {
+            findNavController().navigate(R.id.action_bebasExpiredFragment_to_dataExpiredFragment2)
+        }
+        menarikExpired.setOnClickListener {
+            findNavController().navigate(R.id.action_bebasExpiredFragment_to_tarikBarangFragment)
+        }
+
+        kembali.setOnClickListener { findNavController().navigate(R.id.action_bebasExpiredFragment_to_homeFragment) }
+    }
+
+    private fun drawPieChart(radiusList: List<Float>, colorsList: List<Int>) {
+        val entries = ArrayList<PieEntry>()
+        radiusList.forEachIndexed { index, radius ->
+            if (index == 0) {
+                entries.add(PieEntry(radius, "Didata"))
+            } else {
+                entries.add(PieEntry(radius, "Ditarik"))
+            }
+        }
+        val dataSet = PieDataSet(entries, "Radius")
+        dataSet.colors = colorsList
+
+        val data = PieData(dataSet)
+        pieChart.data = data
+        pieChart.invalidate()
+    }
+
+    private fun fetchDataFromAPIListExpired() {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.227.248:3000") // Change with your API base URL
+            .baseUrl("https://backend.transmart.co.id/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        apiService = retrofit.create(BebasExpiredService::class.java)
+        val apiService = retrofit.create(TarikBarangService::class.java)
 
-        // Initialize views
-        noGondalaEditText = view.findViewById(R.id.no_gondala)
-        kodeEditText = view.findViewById(R.id.kode)
-        tglEditText = view.findViewById(R.id.tgl)
-        itmEditText = view.findViewById(R.id.itm)
-        statusEditText = view.findViewById(R.id.status)
-        jumEditText = view.findViewById(R.id.jum)
-        planeEditText = view.findViewById(R.id.plane)
-        kembali = view.findViewById(R.id.kembali)
-        btnTgl = view.findViewById(R.id.btnTgl)
-        calendar = Calendar.getInstance()
-        btnScan = view.findViewById(R.id.btnScan)
-        btnScanGondala = view.findViewById(R.id.btnScanGondala)
-
-        // Button listeners
-        btnScan.setOnClickListener { scanner() }
-        btnScanGondala.setOnClickListener { scanner2() }
-        btnTgl.setOnClickListener { showDatePickerDialog() }
-        tglEditText.setOnClickListener { showDatePickerDialog() }
-        kembali.setOnClickListener { findNavController().navigate(R.id.action_bebasExpiredFragment_to_homeFragment) }
-
-        // Spinner adapter
-        val adapter = ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.plane,
-            android.R.layout.simple_spinner_item
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        planeEditText.adapter = adapter
-
-        kodeEditText.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                itmEditText.text = "gula"
-                statusEditText.text = "Returnable"
-                if (s.isNullOrEmpty()) {
-                    itmEditText.text = "data not yet available"
-                    statusEditText.text = "data not yet available"
-                }
-            }
-        })
-
-        // Save button click listener
-        val simpanButton: Button = view.findViewById(R.id.simpan)
-        simpanButton.setOnClickListener { simpan() }
-
-        displaySavedResponse()
-    }
-
-    private fun scanner() {
-        val options = ScanOptions()
-        options.setPrompt("Volume up to Flash on")
-        options.setBeepEnabled(true)
-        options.setOrientationLocked(true)
-        options.captureActivity = StartScan::class.java
-        launcher.launch(options)
-    }
-
-    private var launcher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
-        if (result.contents != null) {
-            kodeEditText.setText(result.contents)
-        }
-    }
-
-    private fun scanner2() {
-        val options = ScanOptions()
-        options.setPrompt("Volume up to Flash on")
-        options.setBeepEnabled(true)
-        options.setOrientationLocked(true)
-        options.captureActivity = StartScan::class.java
-        launcher2.launch(options)
-    }
-
-    private var launcher2 = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
-        if (result.contents != null) {
-            noGondalaEditText.setText(result.contents)
-        }
-    }
-
-    private fun simpan() {
-        showDataPopup()
-    }
-
-    private fun showDataPopup() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_data_popup, null)
-
-        // Set nilai ke TextView di dialogView
-        dialogView.findViewById<TextView>(R.id.noGondalaValue).text = noGondalaEditText.text
-        dialogView.findViewById<TextView>(R.id.kodeBarangValue).text = kodeEditText.text
-        dialogView.findViewById<TextView>(R.id.tanggalExpiredValue).text = tglEditText.text
-        dialogView.findViewById<TextView>(R.id.namaItemValue).text = itmEditText.text
-        dialogView.findViewById<TextView>(R.id.statusItemValue).text = statusEditText.text
-        dialogView.findViewById<TextView>(R.id.jumlahValue).text = jumEditText.text
-        dialogView.findViewById<TextView>(R.id.planeValue).text = planeEditText.selectedItem.toString()
-
-        val builder = AlertDialog.Builder(requireContext())
-            .setTitle("Bebas Expired Data")
-            .setView(dialogView)
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-                sendDataToApi()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-
-        val dialog = builder.create()
-        dialog.show()
-    }
-
-
-    private fun sendDataToApi() {
-        val data = BebasExpiredModel().apply {
-            gondalaNumber = noGondalaEditText.text.toString()
-            itemCode = kodeEditText.text.toString()
-            itemName = itmEditText.text.toString()
-            statusItem = statusEditText.text.toString()
-            expiredDate = tglEditText.text.toString() // Keep as string
-            itemAmount = jumEditText.text.toString().toInt()
-            iconePlane = planeEditText.selectedItem.toString()
-            createBy = this@BebasExpiredFragment.createBy
-            storecode = this@BebasExpiredFragment.userstorecode
-            updateBy = createBy
-
-        }
-
-        apiService.postData(data).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        apiService.getListExpired().enqueue(object : Callback<List<TarikBarangModel>> {
+            override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "Data berhasil tersimpan", Toast.LENGTH_SHORT).show()
-                    reset()
+                    val itemList = response.body()
+                    itemList?.let {
+                        saveDataToSharedPreferences(requireContext(), it)
+                    }
+
                 } else {
-                    Toast.makeText(context, "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
-
-                    val errorMessage = "Gagal menyimpan data. Kode status: ${response.code()}, Pesan: ${response.message()}"
-                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-                    Log.e("API_CALL_ERROR", errorMessage)
-
-
+                    // Tangani kesalahan jika respons tidak berhasil
+                    Log.e("TarikBarangFragment", "Gagal mendapatkan data: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Toast.makeText(context, "Terjadi kesalahan: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("API_CALL_ERROR", "Terjadi kesalahan: ${t.message}", t)
-
+            override fun onFailure(call: Call<List<TarikBarangModel>>, t: Throwable) {
+                // Tangani kesalahan koneksi atau respons gagal
+                Log.e("TarikBarangFragment", "Error: ${t.message}")
             }
         })
     }
 
+    private fun fetchDataFromAPIDashboardModel() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://backend.transmart.co.id/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-    private fun reset() {
-        noGondalaEditText.setText("")
-        kodeEditText.setText("")
-        tglEditText.setText("")
-        itmEditText.setText("data not yet available")
-        statusEditText.setText("data not yet available")
-        jumEditText.setText("")
-    }
+        val apiService = retrofit.create(DasboardEspiredService::class.java)
 
-    private fun showDatePickerDialog() {
-        val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            calendar.set(Calendar.YEAR, year)
-            calendar.set(Calendar.MONTH, monthOfYear)
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            updateDateInView()
-        }
+        apiService.getDashboardData().enqueue(object : Callback<DashboardResponse> {
+            override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
+                if (response.isSuccessful) {
+                    val dashboardResponse = response.body()
+                    val dataListed = dashboardResponse?.dataListed
+                    val dataWithdrawn = dashboardResponse?.dataWithdrawn
 
-        DatePickerDialog(
-            requireContext(), dateSetListener,
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
-    }
+                    // Ambil nilai radiusA dan radiusB dari respons API
+                    val radiusAFromAPI = dataListed?.itemListedToday?.toFloatOrNull() ?: 0f
+                    val radiusBFromAPI = dataWithdrawn?.itemWithdrawnToday?.toFloatOrNull() ?: 0f
 
-    private fun updateDateInView() {
-        val myFormat = "dd/MM/yyyy"
-        val sdf = SimpleDateFormat(myFormat, Locale.US)
-        tglEditText.setText(sdf.format(calendar.time))
-    }
 
-    //   local stored
-    private fun displaySavedResponse() {
-        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
-        val responseJson = sharedPreferences.getString("response_json", "")
-        Log.d("ini hit responseJson", "${responseJson}")
+                    // Tetapkan nilai radiusA dan radiusB dari API ke variabel yang sudah dideklarasikan sebelumnya
+                    didata = radiusAFromAPI
+                    ditarik = radiusBFromAPI
 
-        if (!responseJson.isNullOrEmpty()) {
-            try {
-                val jsonObject = JSONObject(responseJson)
-                val userObject = jsonObject.getJSONObject("user")
-                val userName = userObject.getString("name")
-                val storecode = userObject.getString("locationCode")
-                // Ambil nilai 'name' untuk 'createBy'
-                createBy = userName
-                userstorecode = storecode
+                    val radiusA = didata // Variabel untuk radius
+                    val radiusB = ditarik // Variabel untuk radius
 
-            } catch (e: JSONException) {
-                e.printStackTrace()
+                    drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
+
+
+                    Log.d("DashboardData", "didata: ${didata}")
+                    Log.d("DashboardData", "ditarik: ${ditarik}")
+
+                    // Lakukan sesuatu dengan data yang diterima
+                    Log.d("DashboardData", "Item listed today: ${dataListed?.itemListedToday}")
+                    Log.d("DashboardData", "Total items listed: ${dataListed?.totalItemsListed}")
+                    Log.d("DashboardData", "Item withdrawn today: ${dataWithdrawn?.itemWithdrawnToday}")
+                    Log.d("DashboardData", "Total items withdrawn: ${dataWithdrawn?.totalItemsWithdrawn}")
+                } else {
+                    Log.e("BebasExpiredFragment", "Error: ${response.message()}")
+                }
             }
-        }
+
+            override fun onFailure(call: Call<DashboardResponse>, t: Throwable) {
+                // Tangani kesalahan koneksi atau respons gagal
+                Log.e("BebasExpiredFragment", "Error: ${t.message}")
+            }
+        })
     }
+
+    fun saveDataToSharedPreferences(context: Context, itemList: List<TarikBarangModel>) {
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(itemList)
+        editor.putString("listDataExpired", json)
+        editor.apply()
+    }
+
+//    fun loadDataFromSharedPreferences(context: Context): List<TarikBarangModel>? {
+//        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+//        val gson = Gson()
+//        val json = sharedPreferences.getString("listDataExpired", null)
+//        val type = object : TypeToken<List<TarikBarangModel>>() {}.type
+//        return gson.fromJson(json, type)
+//    }
+
+//    private fun displaySavedResponse() {
+//        val sharedPreferences = requireContext().getSharedPreferences("dashboard", Context.MODE_PRIVATE)
+//        val responseJson = sharedPreferences.getString("response_dashboard", "")
+//        Log.d("ini hit responseJson", "${responseJson}")
+//
+//        if (!responseJson.isNullOrEmpty()) {
+//            try {
+//                val jsonObject = JSONObject(responseJson)
+//                val data_listed = jsonObject.getJSONObject("data_listed")
+//                val data_withdrawn = jsonObject.getJSONObject("data_withdrawn")
+//
+//                val item_listed_today = data_listed.getDouble("item_listed_today").toFloat()
+//                val item_withdrawn_today = data_withdrawn.getDouble("item_withdrawn_today").toFloat()
+//
+//                didata = item_listed_today
+//                ditarik = item_withdrawn_today
+//
+//                Log.d("ini hit Data", "$item_listed_today dan $item_withdrawn_today")
+//
+//                val radiusA = didata // Variabel untuk radius
+//                val radiusB = ditarik // Variabel untuk radius
+//
+//                drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
+//
+//            } catch (e: JSONException) {
+//                e.printStackTrace()
+//            }
+//        }
+//
+//    }
+
+
+
 }

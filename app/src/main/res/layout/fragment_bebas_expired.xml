@@ -3,20 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".BebasExpiredFragment">
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:background="@color/primaryColor"
-            android:padding="5dp">
+            android:padding="10dp">
             <ImageView
                 android:id="@+id/kembali"
                 android:layout_width="wrap_content"
@@ -36,241 +34,236 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/header"
+                    android:paddingTop="5dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp">
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Input Barang"
-                        android:textSize="20dp"
-                        android:textColor="@color/blackColor"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp"
-                        android:padding="3dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="No Gondala"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/blackColor"/>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/data"
+                        android:layout_width="0dp"
+                        android:layout_height="150sp"
+                        android:layout_weight="1"
+                        app:cardElevation="5dp"
+                        app:cardCornerRadius="20dp"
+                        app:cardUseCompatPadding="true">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="@drawable/input_shape">
-
-                            <EditText
-                                android:id="@+id/no_gondala"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="No Gondala"/>
-
-                            <ImageButton
-                                android:id="@+id/btnScanGondala"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/scanner"
-                                android:backgroundTint="@color/white"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp"
-                        android:padding="3dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Kode Barang"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/blackColor"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="@drawable/input_shape">
-
-                            <EditText
-                                android:id="@+id/kode"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="Kode Barang"/>
-
-                            <ImageButton
-                                android:id="@+id/btnScan"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/scanner"
-                                android:backgroundTint="@color/white"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Nama Item"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/blackColor"/>
-
-                        <TextView
-                            android:id="@+id/itm"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:text="data not yet available"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/gray"
-                            android:background="@drawable/input_shape"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp"
-                        android:textColor="@color/blackColor">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Status Item : "
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/blackColor"/>
-
-                        <TextView
-                            android:id="@+id/status"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="10dp"
-                            android:text="data not yet available"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/gray"
-                            android:background="@drawable/input_shape"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp"
-                        android:padding="3dp">
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Tanggal Expired"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/blackColor"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:background="@drawable/input_shape">
-
-                            <EditText
-                                android:id="@+id/tgl"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="Tanggal Expired"
-                                android:inputType="none"
-                                android:focusable="false"/>
-
-                            <ImageButton
-                                android:id="@+id/btnTgl"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/tanggal"
-                                android:backgroundTint="@color/white"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp"
-                        android:padding="3dp">
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Jumlah Barang"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/blackColor"/>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/input_shape">
-                            <EditText
-                                android:id="@+id/jum"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="Jumlah Barang"
-                                android:inputType="number"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="10dp"
-                        android:padding="3dp">
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Icone plane"
-                            android:fontFamily="@font/poppinsregular"
-                            android:textColor="@color/blackColor"/>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/input_shape">
-                            <Spinner
-                                android:id="@+id/plane"
-                                android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="10dp">
+                            <ImageView
+                                android:layout_width="40dp"
                                 android:layout_height="40dp"
-                                android:spinnerMode="dropdown" />
-
+                                android:src="@drawable/expired" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/poppinssemibold"
+                                android:text="Mendata Expire" />
                         </LinearLayout>
-                    </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-                    <Button
-                        android:id="@+id/simpan"
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/tarik"
+                        android:layout_width="0dp"
+                        android:layout_height="150sp"
+                        android:layout_weight="1"
+                        app:cardElevation="5dp"
+                        app:cardCornerRadius="20dp"
+                        app:cardUseCompatPadding="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="10dp">
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/expired" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/poppinssemibold"
+                                android:text="Menarik Barang" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp">
+                    <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/button_shape"
-                        android:layout_marginTop="20dp"
-                        android:text="Simpan"/>
+                        android:id="@+id/itemBarang"
+                        app:cardElevation="5dp"
+                        app:cardCornerRadius="5dp"
+                        app:cardUseCompatPadding="true"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="10dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Data Harian"
+                                android:fontFamily="@font/poppinsbold"
+                                android:textSize="16dp"
+                                android:textColor="@color/blackColor"/>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="10dp"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal">
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Didata : "
+                                            android:fontFamily="@font/poppinssemibold"
+                                            android:textSize="20dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="0"
+                                            android:fontFamily="@font/poppinssemibold"
+                                            android:textSize="20dp"/>
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal">
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Ditarik : "
+                                            android:fontFamily="@font/poppinssemibold"
+                                            android:textSize="20dp"/>
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="0"
+                                            android:fontFamily="@font/poppinssemibold"
+                                            android:textSize="20dp"/>
+                                    </LinearLayout>
+
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="150dp"
+                                    android:orientation="vertical"
+                                    android:layout_weight="1">
+
+                                    <com.github.mikephil.charting.charts.PieChart
+                                        android:id="@+id/pieChartDidata"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/itemBarang"
+                        app:cardElevation="5dp"
+                        app:cardCornerRadius="5dp"
+                        app:cardUseCompatPadding="true"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="10dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Expired"
+                                android:fontFamily="@font/poppinsbold"
+                                android:textSize="16dp"
+                                android:textColor="@color/blackColor"/>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="10dp"
+                                android:orientation="vertical">
+
+<!--                                <androidx.recyclerview.widget.RecyclerView-->
+<!--                                    android:layout_width="match_parent"-->
+<!--                                    android:layout_height="match_parent"-->
+<!--                                    android:id="@+id/dExpired"/>-->
+
+                                <androidx.recyclerview.widget.RecyclerView
+                                    android:id="@+id/dExpired"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                    tools:listitem="@layout/item_barang" />
+
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+
                 </LinearLayout>
-            </RelativeLayout>
+
+            </LinearLayout>
+
+
+
         </ScrollView>
 
     </LinearLayout>
+
+
+
 </FrameLayout>
