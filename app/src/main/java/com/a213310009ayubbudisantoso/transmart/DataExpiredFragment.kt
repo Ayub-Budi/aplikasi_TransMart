@@ -306,12 +306,6 @@ class DataExpiredFragment : Fragment() {
         // Buat instance service
         val service = retrofit.create(MasterItemService::class.java)
 
-        // Buat body permintaan dengan barcode dan storeCode
-//        val requestBody = RequestBody.create(
-//            "application/json; charset=utf-8".toMediaTypeOrNull(),
-//            "{\"barcode\": \"$barcode\", \"storecode\": \"$storeCode\"}"
-//        )
-
         val jsonObject = JsonObject().apply {
             addProperty("barcode", barcode)
             addProperty("storecode", storeCode)
@@ -330,6 +324,7 @@ class DataExpiredFragment : Fragment() {
                         itmEditText.text = it.item_desc
                         statusEditText.text = if (responseData.refunable == "y") "returnable" else "non-returnable"
                         itemCode = it.item_code
+                        Log.d("itemCode", "itemCode: $itemCode")
 
                         Toast.makeText(context, "Data ditemukan", Toast.LENGTH_SHORT).show()
                     }
@@ -346,4 +341,6 @@ class DataExpiredFragment : Fragment() {
                 Log.d("API Error", "Failed to send barcode: ${t.message}")
             }
         })
-    }}
+    }
+
+}

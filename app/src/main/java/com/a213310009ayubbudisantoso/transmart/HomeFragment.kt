@@ -8,21 +8,25 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.navigation.fragment.findNavController
+import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
+import com.a213310009ayubbudisantoso.transmart.api.services.DasboardEspiredService
+import com.google.gson.Gson
 import org.json.JSONException
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class HomeFragment : Fragment() {
 
     private var nameUesr: String? = null
     private var storeUser: String? = null
-
-//    private lateinit var name: TextView
-//    private lateinit var store: TextView
 
 
     override fun onCreateView(
@@ -78,6 +82,8 @@ class HomeFragment : Fragment() {
         displaySavedResponse()
         nameText.text = this@HomeFragment.nameUesr
         storeText.text = this@HomeFragment.storeUser
+
+        fetchDataFromAPIDashboardModel()
     }
 
     private fun displaySavedResponse() {
@@ -100,5 +106,52 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    fun saveDataToSharedPreferences(context: Context, itemList: DashboardResponse?) {
+        val sharedPreferences = context.getSharedPreferences("dashboard", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(itemList)
+        editor.putString("response_dashboard", json)
+        editor.apply()
+    }
+
+
+
+    fun fetchDataFromAPIDashboardModel() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://backend.transmart.co.id/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val apiService = retrofit.create(DasboardEspiredService::class.java)
+
+        apiService.getDashboardData().enqueue(object : Callback<DashboardResponse> {
+            override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
+                if (response.isSuccessful) {
+                    val dashboardResponse = response.body()
+                    val dataListed = dashboardResponse?.dataListed
+                    val dataWithdrawn = dashboardResponse?.dataWithdrawn
+
+                    saveDataToSharedPreferences(requireContext(), dashboardResponse)
+
+
+                    // Lakukan sesuatu dengan data yang diterima
+                    Log.d("DashboardData", "Item listed today: ${dataListed?.itemListedToday}")
+                    Log.d("DashboardData", "Total items listed: ${dataListed?.totalItemsListed}")
+                    Log.d("DashboardData", "Item withdrawn today: ${dataWithdrawn?.itemWithdrawnToday}")
+                    Log.d("DashboardData", "Total items withdrawn: ${dataWithdrawn?.totalItemsWithdrawn}")
+                } else {
+                    Log.e("BebasExpiredFragment", "Error: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<DashboardResponse>, t: Throwable) {
+                // Tangani kesalahan koneksi atau respons gagal
+                Log.e("BebasExpiredFragment", "Error: ${t.message}")
+            }
+        })
+    }
+
 
 }

@@ -11,7 +11,10 @@ import android.widget.ImageView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.a213310009ayubbudisantoso.transmart.api.model.DaasboardExpiredModel
+import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
 import com.a213310009ayubbudisantoso.transmart.api.model.TarikBarangModel
+import com.a213310009ayubbudisantoso.transmart.api.services.DasboardEspiredService
 import com.a213310009ayubbudisantoso.transmart.api.services.TarikBarangService
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
@@ -19,6 +22,8 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,6 +33,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 class BebasExpiredFragment : Fragment() {
     private lateinit var kembali: ImageView
     private lateinit var pieChart: PieChart
+
+    private var didata = 0f // Variabel untuk radius
+    private var ditarik = 0f // Variabel untuk radius
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,12 +51,14 @@ class BebasExpiredFragment : Fragment() {
         kembali = view.findViewById(R.id.kembali)
         pieChart = view.findViewById(R.id.pieChartDidata)
 
-        val radiusA = 10f // Variabel untuk radius
-        val radiusB = 2f // Variabel untuk radius
 
-        drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
+
+
+        fetchDataFromAPIDashboardModel()
 
         fetchDataFromAPIListExpired()
+
+//        displaySavedResponse()
 
         dataExpired.setOnClickListener {
             findNavController().navigate(R.id.action_bebasExpiredFragment_to_dataExpiredFragment2)
@@ -105,6 +116,56 @@ class BebasExpiredFragment : Fragment() {
         })
     }
 
+    private fun fetchDataFromAPIDashboardModel() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://backend.transmart.co.id/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val apiService = retrofit.create(DasboardEspiredService::class.java)
+
+        apiService.getDashboardData().enqueue(object : Callback<DashboardResponse> {
+            override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
+                if (response.isSuccessful) {
+                    val dashboardResponse = response.body()
+                    val dataListed = dashboardResponse?.dataListed
+                    val dataWithdrawn = dashboardResponse?.dataWithdrawn
+
+                    // Ambil nilai radiusA dan radiusB dari respons API
+                    val radiusAFromAPI = dataListed?.itemListedToday?.toFloatOrNull() ?: 0f
+                    val radiusBFromAPI = dataWithdrawn?.itemWithdrawnToday?.toFloatOrNull() ?: 0f
+
+
+                    // Tetapkan nilai radiusA dan radiusB dari API ke variabel yang sudah dideklarasikan sebelumnya
+                    didata = radiusAFromAPI
+                    ditarik = radiusBFromAPI
+
+                    val radiusA = didata // Variabel untuk radius
+                    val radiusB = ditarik // Variabel untuk radius
+
+                    drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
+
+
+                    Log.d("DashboardData", "didata: ${didata}")
+                    Log.d("DashboardData", "ditarik: ${ditarik}")
+
+                    // Lakukan sesuatu dengan data yang diterima
+                    Log.d("DashboardData", "Item listed today: ${dataListed?.itemListedToday}")
+                    Log.d("DashboardData", "Total items listed: ${dataListed?.totalItemsListed}")
+                    Log.d("DashboardData", "Item withdrawn today: ${dataWithdrawn?.itemWithdrawnToday}")
+                    Log.d("DashboardData", "Total items withdrawn: ${dataWithdrawn?.totalItemsWithdrawn}")
+                } else {
+                    Log.e("BebasExpiredFragment", "Error: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<DashboardResponse>, t: Throwable) {
+                // Tangani kesalahan koneksi atau respons gagal
+                Log.e("BebasExpiredFragment", "Error: ${t.message}")
+            }
+        })
+    }
+
     fun saveDataToSharedPreferences(context: Context, itemList: List<TarikBarangModel>) {
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -121,5 +182,38 @@ class BebasExpiredFragment : Fragment() {
 //        val type = object : TypeToken<List<TarikBarangModel>>() {}.type
 //        return gson.fromJson(json, type)
 //    }
+
+//    private fun displaySavedResponse() {
+//        val sharedPreferences = requireContext().getSharedPreferences("dashboard", Context.MODE_PRIVATE)
+//        val responseJson = sharedPreferences.getString("response_dashboard", "")
+//        Log.d("ini hit responseJson", "${responseJson}")
+//
+//        if (!responseJson.isNullOrEmpty()) {
+//            try {
+//                val jsonObject = JSONObject(responseJson)
+//                val data_listed = jsonObject.getJSONObject("data_listed")
+//                val data_withdrawn = jsonObject.getJSONObject("data_withdrawn")
+//
+//                val item_listed_today = data_listed.getDouble("item_listed_today").toFloat()
+//                val item_withdrawn_today = data_withdrawn.getDouble("item_withdrawn_today").toFloat()
+//
+//                didata = item_listed_today
+//                ditarik = item_withdrawn_today
+//
+//                Log.d("ini hit Data", "$item_listed_today dan $item_withdrawn_today")
+//
+//                val radiusA = didata // Variabel untuk radius
+//                val radiusB = ditarik // Variabel untuk radius
+//
+//                drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
+//
+//            } catch (e: JSONException) {
+//                e.printStackTrace()
+//            }
+//        }
+//
+//    }
+
+
 
 }
