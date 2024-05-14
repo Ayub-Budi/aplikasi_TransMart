@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.a213310009ayubbudisantoso.transmart.R
 import com.a213310009ayubbudisantoso.transmart.api.model.TarikBarangModel
+import com.google.gson.Gson
 import java.text.ParseException
 
 class TarikBarangAdapter(private var itemList: List<TarikBarangModel>) :
@@ -76,10 +77,14 @@ class TarikBarangAdapter(private var itemList: List<TarikBarangModel>) :
             // Menambahkan listener klik item
             itemView.setOnClickListener {
                 itemClickListener?.onItemClick(item)
+
+                val gson = Gson()
+                val jsonString = gson.toJson(item)
+
                 // Simpan item ke SharedPreferences dengan nama "item"
                 val sharedPreferences = itemView.context.getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
-                editor.putString("item", item.toString()) // Ubah item.toString() sesuai dengan representasi data item Anda
+                editor.putString("item", jsonString) // Ubah item.toString() sesuai dengan representasi data item Anda
                 editor.apply()
             }
         }

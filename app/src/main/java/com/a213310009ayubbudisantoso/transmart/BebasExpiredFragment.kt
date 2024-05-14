@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -33,6 +34,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class BebasExpiredFragment : Fragment() {
     private lateinit var kembali: ImageView
     private lateinit var pieChart: PieChart
+    private lateinit var didataText: TextView
+    private lateinit var ditarikText: TextView
 
     private var didata = 0f // Variabel untuk radius
     private var ditarik = 0f // Variabel untuk radius
@@ -50,6 +53,8 @@ class BebasExpiredFragment : Fragment() {
         val menarikExpired = view.findViewById<CardView>(R.id.tarik)
         kembali = view.findViewById(R.id.kembali)
         pieChart = view.findViewById(R.id.pieChartDidata)
+        didataText = view.findViewById(R.id.diDataId)
+        ditarikText = view.findViewById(R.id.diTarikId)
 
 
 
@@ -58,7 +63,7 @@ class BebasExpiredFragment : Fragment() {
 
         fetchDataFromAPIListExpired()
 
-//        displaySavedResponse()
+        displaySavedResponse()
 
         dataExpired.setOnClickListener {
             findNavController().navigate(R.id.action_bebasExpiredFragment_to_dataExpiredFragment2)
@@ -140,6 +145,10 @@ class BebasExpiredFragment : Fragment() {
                     didata = radiusAFromAPI
                     ditarik = radiusBFromAPI
 
+                    didataText.text = dataListed?.itemListedToday
+                    ditarikText.text = dataWithdrawn?.itemWithdrawnToday
+
+
                     val radiusA = didata // Variabel untuk radius
                     val radiusB = ditarik // Variabel untuk radius
 
@@ -183,36 +192,36 @@ class BebasExpiredFragment : Fragment() {
 //        return gson.fromJson(json, type)
 //    }
 
-//    private fun displaySavedResponse() {
-//        val sharedPreferences = requireContext().getSharedPreferences("dashboard", Context.MODE_PRIVATE)
-//        val responseJson = sharedPreferences.getString("response_dashboard", "")
-//        Log.d("ini hit responseJson", "${responseJson}")
-//
-//        if (!responseJson.isNullOrEmpty()) {
-//            try {
-//                val jsonObject = JSONObject(responseJson)
-//                val data_listed = jsonObject.getJSONObject("data_listed")
-//                val data_withdrawn = jsonObject.getJSONObject("data_withdrawn")
-//
-//                val item_listed_today = data_listed.getDouble("item_listed_today").toFloat()
-//                val item_withdrawn_today = data_withdrawn.getDouble("item_withdrawn_today").toFloat()
-//
-//                didata = item_listed_today
-//                ditarik = item_withdrawn_today
-//
-//                Log.d("ini hit Data", "$item_listed_today dan $item_withdrawn_today")
-//
-//                val radiusA = didata // Variabel untuk radius
-//                val radiusB = ditarik // Variabel untuk radius
-//
-//                drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
-//
-//            } catch (e: JSONException) {
-//                e.printStackTrace()
-//            }
-//        }
-//
-//    }
+    private fun displaySavedResponse() {
+        val sharedPreferences = requireContext().getSharedPreferences("dashboard", Context.MODE_PRIVATE)
+        val responseJson = sharedPreferences.getString("response_dashboard", "")
+        Log.d("ini hit responseJson", "${responseJson}")
+
+        if (!responseJson.isNullOrEmpty()) {
+            try {
+                val jsonObject = JSONObject(responseJson)
+                val data_listed = jsonObject.getJSONObject("data_listed")
+                val data_withdrawn = jsonObject.getJSONObject("data_withdrawn")
+
+                val item_listed_today = data_listed.getDouble("item_listed_today").toFloat()
+                val item_withdrawn_today = data_withdrawn.getDouble("item_withdrawn_today").toFloat()
+
+                didata = item_listed_today
+                ditarik = item_withdrawn_today
+
+                Log.d("ini hit Data", "$item_listed_today dan $item_withdrawn_today")
+
+                val radiusA = didata // Variabel untuk radius
+                val radiusB = ditarik // Variabel untuk radius
+
+                drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
+
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+
+    }
 
 
 
