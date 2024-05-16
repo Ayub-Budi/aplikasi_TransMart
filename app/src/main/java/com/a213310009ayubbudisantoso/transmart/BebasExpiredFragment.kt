@@ -12,7 +12,10 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.a213310009ayubbudisantoso.transmart.api.model.DaasboardExpiredModel
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.a213310009ayubbudisantoso.transmart.api.adapter.DasboardItemAdapter
+import com.a213310009ayubbudisantoso.transmart.api.model.ClosestItem
 import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
 import com.a213310009ayubbudisantoso.transmart.api.model.TarikBarangModel
 import com.a213310009ayubbudisantoso.transmart.api.services.DasboardEspiredService
@@ -36,9 +39,13 @@ class BebasExpiredFragment : Fragment() {
     private lateinit var pieChart: PieChart
     private lateinit var didataText: TextView
     private lateinit var ditarikText: TextView
+    private lateinit var showMoreText: TextView
+
+    private lateinit var adapter: DasboardItemAdapter
 
     private var didata = 0f // Variabel untuk radius
     private var ditarik = 0f // Variabel untuk radius
+
 
 
     override fun onCreateView(
@@ -52,6 +59,7 @@ class BebasExpiredFragment : Fragment() {
         val dataExpired = view.findViewById<CardView>(R.id.data)
         val menarikExpired = view.findViewById<CardView>(R.id.tarik)
         kembali = view.findViewById(R.id.kembali)
+        showMoreText = view.findViewById(R.id.showMore)
         pieChart = view.findViewById(R.id.pieChartDidata)
         didataText = view.findViewById(R.id.diDataId)
         ditarikText = view.findViewById(R.id.diTarikId)
@@ -72,7 +80,29 @@ class BebasExpiredFragment : Fragment() {
             findNavController().navigate(R.id.action_bebasExpiredFragment_to_tarikBarangFragment)
         }
 
+        showMoreText.setOnClickListener { findNavController().navigate(R.id.action_bebasExpiredFragment_to_tarikBarangFragment) }
         kembali.setOnClickListener { findNavController().navigate(R.id.action_bebasExpiredFragment_to_homeFragment) }
+
+//         Inisialisasi RecyclerView
+        val recyclerView: RecyclerView = view.findViewById(R.id.dExpired)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+// Inisialisasi adapter RecyclerView
+        adapter = DasboardItemAdapter(emptyList())
+
+        adapter.setOnItemClickListener(object : DasboardItemAdapter.OnItemClickListener {
+            override fun onItemClick(item: ClosestItem) {
+                // Navigasi ke DetailItemFragment saat item diklik
+                findNavController().navigate(R.id.action_bebasExpiredFragment_to_detailItemFragment)
+            }
+
+        })
+        // Set adapter pada RecyclerView
+        recyclerView.adapter = adapter
+
+        displaySavedResponseD()
+
+
     }
 
     private fun drawPieChart(radiusList: List<Float>, colorsList: List<Int>) {
@@ -106,6 +136,8 @@ class BebasExpiredFragment : Fragment() {
                     val itemList = response.body()
                     itemList?.let {
                         saveDataToSharedPreferences(requireContext(), it)
+                        Log.e("TarikBarangFragment", "Dendapatkan data: ${it}")
+
                     }
 
                 } else {
@@ -223,6 +255,30 @@ class BebasExpiredFragment : Fragment() {
 
     }
 
+    private fun displaySavedResponseD() {
+        val sharedPreferences = requireContext().getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
+        val responseJson = sharedPreferences.getString("itemDasboardList", "")
+        Log.d("displaySavedResponse", "$responseJson")
 
+        if (!responseJson.isNullOrEmpty()) {
+            try {
+                val jsonObject = JSONObject(responseJson)
+                val closestItemsJsonArray = jsonObject.getJSONArray("closest_items")
+
+                val gson = Gson()
+                val itemType = object : TypeToken<List<ClosestItem>>() {}.type
+                val itemList: List<ClosestItem> = gson.fromJson(closestItemsJsonArray.toString(), itemType)
+
+                // Display data in RecyclerView if available
+                if (itemList.isNotEmpty()) {
+                    adapter.setData(itemList)
+                } else {
+                    Log.d("displaySavedResponse", "No data available")
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+    }
 
 }

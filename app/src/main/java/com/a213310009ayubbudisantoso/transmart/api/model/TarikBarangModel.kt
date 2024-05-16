@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 
 class TarikBarangModel(
+    @SerializedName("expiry_period") var expiryperiod: ExpiryPeriod?,
     @SerializedName("ie_id") var ieId: String?,
     @SerializedName("ie_store_code") var ieStoreCode: String?,
     @SerializedName("ie_gondola_no") var ieGondolaNo: String?,
@@ -20,6 +21,6 @@ class TarikBarangModel(
     @SerializedName("ie_update_date") var ieUpdateDate: String?
 ) {
     override fun toString(): String {
-        return "TarikBarangModel(ieId=$ieId, ieStoreCode=$ieStoreCode, ieGondolaNo=$ieGondolaNo, ieBarcode=$ieBarcode, ieItemCode=$ieItemCode, ieItemName=$ieItemName, ieItemStatus=$ieItemStatus, ieExpiredDate=$ieExpiredDate, ieQty=$ieQty, ieAction=$ieAction, ieInsertUser=$ieInsertUser, ieInsertDate=$ieInsertDate, ieUpdateUser=$ieUpdateUser, ieUpdateDate=$ieUpdateDate)"
+        return "TarikBarangModel(expiryperiod=$expiryperiod ieId=$ieId, ieStoreCode=$ieStoreCode, ieGondolaNo=$ieGondolaNo, ieBarcode=$ieBarcode, ieItemCode=$ieItemCode, ieItemName=$ieItemName, ieItemStatus=$ieItemStatus, ieExpiredDate=$ieExpiredDate, ieQty=$ieQty, ieAction=$ieAction, ieInsertUser=$ieInsertUser, ieInsertDate=$ieInsertDate, ieUpdateUser=$ieUpdateUser, ieUpdateDate=$ieUpdateDate)"
     }
 }

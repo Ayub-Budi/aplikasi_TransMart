@@ -223,32 +223,43 @@
                             android:padding="10dp"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Expired"
-                                android:fontFamily="@font/poppinsbold"
-                                android:textSize="16dp"
-                                android:textColor="@color/blackColor"/>
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
 
+                                <TextView
+                                    android:id="@+id/textExpired"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Expired"
+                                    android:fontFamily="@font/poppinsbold"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/blackColor"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/showMore"
+                                    android:text="Show more"
+                                    android:fontFamily="@font/poppinsregular"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/primaryColor"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_alignParentRight="true"/>
+
+                            </RelativeLayout>
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="10dp"
                                 android:orientation="vertical">
 
-<!--                                <androidx.recyclerview.widget.RecyclerView-->
-<!--                                    android:layout_width="match_parent"-->
-<!--                                    android:layout_height="match_parent"-->
-<!--                                    android:id="@+id/dExpired"/>-->
-
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/dExpired"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                                    tools:listitem="@layout/item_barang" />
-
+                                    tools:listitem="@layout/dasboard_item_list" />
                             </LinearLayout>
 
 
