@@ -1,5 +1,6 @@
 package com.a213310009ayubbudisantoso.transmart
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -67,6 +68,12 @@ class LoginFragment : Fragment() {
             val pass = password.text.toString()
 
             if (user.isNotEmpty() && pass.isNotEmpty()) {
+
+                val progressDialog = ProgressDialog(context)
+                progressDialog.setMessage("Loading...")
+                progressDialog.setCancelable(false)
+                progressDialog.show()
+
                 val requestBody = MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("username", user)
@@ -88,6 +95,9 @@ class LoginFragment : Fragment() {
                 httpClient.newCall(request).enqueue(object : Callback {
                     override fun onResponse(call: Call, response: Response) {
                         val responseBody = response.body?.string() // Baca konten respons
+
+                        progressDialog.dismiss() // Hentikan animasi loading
+
                         if (response.isSuccessful && responseBody != null) {
                             val jsonResponse = JSONObject(responseBody)
                             val error = jsonResponse.getBoolean("error")
