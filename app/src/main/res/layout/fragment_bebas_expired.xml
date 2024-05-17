@@ -66,12 +66,12 @@
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
-                                android:src="@drawable/expired" />
+                                android:src="@drawable/note_add" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppinssemibold"
-                                android:text="Mendata Expire" />
+                                android:text="Pendataan Expire" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -93,12 +93,12 @@
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
-                                android:src="@drawable/expired" />
+                                android:src="@drawable/withdraw" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppinssemibold"
-                                android:text="Menarik Barang" />
+                                android:text="Penarikan Barang" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
                 </LinearLayout>
@@ -271,12 +271,8 @@
 
             </LinearLayout>
 
-
-
         </ScrollView>
 
     </LinearLayout>
-
-
 
 </FrameLayout>

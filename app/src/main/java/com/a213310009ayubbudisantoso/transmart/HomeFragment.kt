@@ -5,10 +5,13 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
@@ -18,6 +21,8 @@ import com.a213310009ayubbudisantoso.transmart.api.model.DashboardData
 import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
 import com.a213310009ayubbudisantoso.transmart.api.services.DasboardEspiredService
 import com.a213310009ayubbudisantoso.transmart.api.services.DasboardItemService
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,33 +55,39 @@ class HomeFragment : Fragment() {
         val bebasExpired = view.findViewById<CardView>(R.id.expired)
         val listBarang = view.findViewById<CardView>(R.id.listBarang)
 
-        val powerOff = view.findViewById<ImageButton>(R.id.powerOff)
-
+        //perbaiki
         val nameText = view.findViewById<TextView>(R.id.name)
         val storeText = view.findViewById<TextView>(R.id.storeName)
 
-        powerOff.setOnClickListener{
-            // Buat dialog konfirmasi
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("Konfirmasi")
-            builder.setMessage("Apakah Anda yakin ingin keluar?")
 
-            // Tombol untuk mengkonfirmasi
-            builder.setPositiveButton("Ya") { dialog, _ ->
-                // Tutup aktivitas
-                requireActivity().finish()
-                dialog.dismiss()
-            }
-
-            // Tombol untuk membatalkan
-            builder.setNegativeButton("Tidak") { dialog, _ ->
-                dialog.dismiss()
-            }
-
-            // Tampilkan dialog
-            val dialog = builder.create()
-            dialog.show()
+        val buttonShowBottomSheet = view.findViewById<ImageView>(R.id.buttonShowBottomSheet)
+        buttonShowBottomSheet.setOnClickListener {
+            val bottomSheet = ProfileBottomSheetFragment()
+            bottomSheet.show(childFragmentManager, bottomSheet.tag)
         }
+
+//        powerOff.setOnClickListener{
+//            // Buat dialog konfirmasi
+//            val builder = AlertDialog.Builder(requireContext())
+//            builder.setTitle("Konfirmasi")
+//            builder.setMessage("Apakah Anda yakin ingin keluar?")
+//
+//            // Tombol untuk mengkonfirmasi
+//            builder.setPositiveButton("Ya") { dialog, _ ->
+//                // Tutup aktivitas
+//                requireActivity().finish()
+//                dialog.dismiss()
+//            }
+//
+//            // Tombol untuk membatalkan
+//            builder.setNegativeButton("Tidak") { dialog, _ ->
+//                dialog.dismiss()
+//            }
+//
+//            // Tampilkan dialog
+//            val dialog = builder.create()
+//            dialog.show()
+//        }
 
         bebasExpired.setOnClickListener{
             findNavController().navigate(R.id.action_homeFragment_to_bebasExpiredFragment)
