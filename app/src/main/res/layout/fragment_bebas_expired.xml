@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".BebasExpiredFragment">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,10 +32,23 @@
                 android:paddingStart="10dp"/>
         </LinearLayout>
 
+
+        <!-- Loading Animation ImageView -->
+        <ImageView
+            android:id="@+id/loadingAnimation"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top|center_horizontal"
+            android:visibility="gone"
+            android:src="@drawable/loading" /> <!-- Ganti dengan animasi loading Anda -->
+
+
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/scrollViewD">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

@@ -4,11 +4,12 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -46,6 +47,9 @@ class BebasExpiredFragment : Fragment() {
     private var didata = 0f // Variabel untuk radius
     private var ditarik = 0f // Variabel untuk radius
 
+    private lateinit var scrollView: ScrollView
+    private lateinit var loadingAnimation: ImageView
+
 
 
     override fun onCreateView(
@@ -63,6 +67,52 @@ class BebasExpiredFragment : Fragment() {
         pieChart = view.findViewById(R.id.pieChartDidata)
         didataText = view.findViewById(R.id.diDataId)
         ditarikText = view.findViewById(R.id.diTarikId)
+
+        scrollView = view.findViewById(R.id.scrollViewD)
+        loadingAnimation = view.findViewById(R.id.loadingAnimation) // Initialize loadingAnimation here
+
+
+        scrollView.viewTreeObserver.addOnScrollChangedListener(object : ViewTreeObserver.OnScrollChangedListener {
+            override fun onScrollChanged() {
+                if (!scrollView.canScrollVertically(-1)) {
+                    // The scrollView is at the top
+                    Log.d("ScrollView", "ScrollView is at the top")
+                }
+            }
+        })
+
+        scrollView.setOnTouchListener(object : View.OnTouchListener {
+            private var startY = 0f
+            private var isPullingDown = false
+
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                if (event != null) {
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            startY = event.y
+                            isPullingDown = false
+                        }
+                        MotionEvent.ACTION_MOVE -> {
+                            if (!scrollView.canScrollVertically(-1) && event.y > startY) {
+                                isPullingDown = true
+                            }
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            if (isPullingDown) {
+                                Log.d("ScrollView", "berhasil tarik ke atas")
+                                Toast.makeText(context, "Berhasil tarik ke atas", Toast.LENGTH_SHORT).show()
+                                startLoadingAnimation()
+                                // Stop the animation after a delay (e.g., 2 seconds)
+                                scrollView.postDelayed({
+                                    stopLoadingAnimation()
+                                }, 2000)
+                            }
+                        }
+                    }
+                }
+                return false
+            }
+        })
 
 
 
@@ -278,6 +328,41 @@ class BebasExpiredFragment : Fragment() {
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
+        }
+    }
+
+//    private fun startLoadingAnimation() {
+//        loadingAnimation.visibility = View.VISIBLE
+//        val rotateAnimation = AnimationUtils.loadAnimation(context, R.anim.rotate)
+//        loadingAnimation.startAnimation(rotateAnimation)
+//    }
+
+    private fun stopLoadingAnimation() {
+        loadingAnimation.clearAnimation()
+        loadingAnimation.visibility = View.GONE
+    }
+
+    private fun startLoadingAnimation() {
+        // Pastikan loadingAnimation sudah diinisialisasi sebelum digunakan
+        if (::loadingAnimation.isInitialized) {
+            loadingAnimation.visibility = View.VISIBLE
+
+            // Lakukan tindakan animasi tambahan jika diperlukan
+            // Contoh: Menjalankan animasi
+            loadingAnimation.animate()
+                .alpha(1.0f)
+                .setDuration(500)
+                .withEndAction {
+                    // Sembunyikan animasi setelah selesai
+                    loadingAnimation.animate()
+                        .alpha(0.0f)
+                        .setDuration(500)
+                        .withEndAction {
+                            loadingAnimation.visibility = View.GONE
+                        }
+                }
+        } else {
+            Log.e("BebasExpiredFragment", "loadingAnimation belum diinisialisasi")
         }
     }
 
