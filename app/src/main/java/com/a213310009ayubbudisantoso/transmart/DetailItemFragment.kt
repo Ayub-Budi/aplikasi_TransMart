@@ -163,17 +163,26 @@ class DetailItemFragment : Fragment() {
 //            // Handle the image and send it to the API
 ////            uploadImageToAPI(imageUri)
 //            hasilFoto.visibility = View.VISIBLE
+
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Load the image from the saved URI into the ImageView
+            imageUri?.let { uri ->
+                hasilFoto.visibility = View.VISIBLE
+                hasilFoto.setImageURI(uri)
+            }
+        }
 //        }
 
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            val imageBitmap = data.extras?.get("data") as? Bitmap
-            if (imageBitmap != null) {
-                hasilFoto.visibility = View.VISIBLE
-                hasilFoto.setImageBitmap(imageBitmap)
-            } else {
-                Log.e("DetailItemFragment", "Bitmap is null")
-            }
-        }    }
+//        if (requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+//            val imageBitmap = data.extras?.get("data") as? Bitmap
+//            if (imageBitmap != null) {
+//                hasilFoto.visibility = View.VISIBLE
+//                hasilFoto.setImageBitmap(imageBitmap)
+//            } else {
+//                Log.e("DetailItemFragment", "Bitmap is null")
+//            }
+//        }
+    }
 
 //    private fun uploadImageToAPI(imageUri: Uri) {
 //        val retrofit = Retrofit.Builder()

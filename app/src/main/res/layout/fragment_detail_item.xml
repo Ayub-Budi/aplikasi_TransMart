@@ -220,10 +220,11 @@
 
 
             <ImageView
+                android:id="@+id/hasilFoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/hasilFoto"
-                android:visibility="visible"/>
+                android:scaleType="fitCenter"
+                android:src="@drawable/placeholder_image"/>
 
         </LinearLayout>
 
