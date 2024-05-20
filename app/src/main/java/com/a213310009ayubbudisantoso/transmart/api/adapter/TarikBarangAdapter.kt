@@ -54,10 +54,12 @@ class TarikBarangAdapter(private var itemList: List<TarikBarangModel>) :
         private val tanggalTextView: TextView = itemView.findViewById(R.id.tanggal)
         private val jumlahTextView: TextView = itemView.findViewById(R.id.jumlah)
         private val statusTextView: TextView = itemView.findViewById(R.id.statusItem)
+        private val hari: TextView = itemView.findViewById(R.id.hari)
 
         @RequiresApi(Build.VERSION_CODES.N)
         fun bind(item: TarikBarangModel) {
             nameTextView.text = item.ieItemName
+            hari.text = item.remainingDays.toString()
             jumlahTextView.text = item.ieQty.toString()
             statusTextView.text = item.ieItemStatus
 //            statusTextView.text = if (item.ieItemStatus == "y") "returnable" else "non-returnable"

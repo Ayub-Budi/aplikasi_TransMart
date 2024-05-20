@@ -65,6 +65,43 @@
                         android:textColor="@color/blackColor"
                         android:fontFamily="@font/poppinssemibold" />
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppinsregular"
+                            android:text="Expierd dalam"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/hari"
+                            android:layout_marginStart="5dp"
+                            android:fontFamily="@font/poppinsregular"
+                            android:text="00"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:fontFamily="@font/poppinsregular"
+                            android:text="hari lagi"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+
+                    </LinearLayout>
+
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
