@@ -1,5 +1,6 @@
 package com.a213310009ayubbudisantoso.transmart
 
+import DashboardExpiredModel
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
@@ -27,6 +28,11 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
@@ -72,49 +78,15 @@ class BebasExpiredFragment : Fragment() {
         loadingAnimation = view.findViewById(R.id.loadingAnimation) // Initialize loadingAnimation here
 
 
-        scrollView.viewTreeObserver.addOnScrollChangedListener(object : ViewTreeObserver.OnScrollChangedListener {
-            override fun onScrollChanged() {
-                if (!scrollView.canScrollVertically(-1)) {
-                    // The scrollView is at the top
-                    Log.d("ScrollView", "ScrollView is at the top")
-                }
-            }
-        })
-
-        scrollView.setOnTouchListener(object : View.OnTouchListener {
-            private var startY = 0f
-            private var isPullingDown = false
-
-            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                if (event != null) {
-                    when (event.action) {
-                        MotionEvent.ACTION_DOWN -> {
-                            startY = event.y
-                            isPullingDown = false
-                        }
-                        MotionEvent.ACTION_MOVE -> {
-                            if (!scrollView.canScrollVertically(-1) && event.y > startY) {
-                                isPullingDown = true
-                            }
-                        }
-                        MotionEvent.ACTION_UP -> {
-                            if (isPullingDown) {
-                                Log.d("ScrollView", "berhasil tarik ke atas")
-                                Toast.makeText(context, "Berhasil tarik ke atas", Toast.LENGTH_SHORT).show()
-                                startLoadingAnimation()
-                                // Stop the animation after a delay (e.g., 2 seconds)
-                                scrollView.postDelayed({
-                                    stopLoadingAnimation()
-                                }, 2000)
-                            }
-                        }
-                    }
-                }
-                return false
-            }
-        })
-
-
+//        scrollView.viewTreeObserver.addOnScrollChangedListener(object : ViewTreeObserver.OnScrollChangedListener {
+//            override fun onScrollChanged() {
+//                if (!scrollView.canScrollVertically(-1)) {
+//                    // The scrollView is at the top
+//                    Log.d("ScrollView", "ScrollView is at the top")
+//                }
+//            }
+//        })
+        setupTouchListener()
 
 
         fetchDataFromAPIDashboardModel()
@@ -331,6 +303,48 @@ class BebasExpiredFragment : Fragment() {
         }
     }
 
+    private fun fetchDataFromAPIDasboardList() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val url = "https://backend.transmart.co.id/apiMobile/dashboard-expiringSoon"
+                val client = OkHttpClient()
+                val request = Request.Builder().url(url).build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        Log.e("HomeFragment", "Failed to retrieve data: ${response.code}")
+                        return@use
+                    }
+
+                    val responseBody = response.body?.string()
+                    responseBody?.let {
+                        saveDataToSharedPreferencesListD(requireContext(), it)
+                        parseAndLogApiResponse(it)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("HomeFragment", e.message ?: "Unknown error")
+            }
+        }
+    }
+    private fun parseAndLogApiResponse(responseBody: String) {
+        val gson = Gson()
+        val apiResponse = gson.fromJson(responseBody, DashboardExpiredModel::class.java)
+        Log.d("HomeFragment", "Total item nearing expiration: ${apiResponse.totalItemNearingExpiration}")
+        Log.d("HomeFragment", "Nearest expiration date: ${apiResponse.nearestExpirationDate}")
+        apiResponse.closestItems?.forEach {
+            Log.d("HomeFragment", "Item Name: ${it.ieItemName}, Remaining Days: ${it.remainingDays}")
+        }
+    }
+
+    private fun saveDataToSharedPreferencesListD(context: Context, responseBody: String) {
+        val sharedPreferences = context.getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("itemDasboardList", responseBody)
+        editor.apply()
+    }
+
+
+
 //    private fun startLoadingAnimation() {
 //        loadingAnimation.visibility = View.VISIBLE
 //        val rotateAnimation = AnimationUtils.loadAnimation(context, R.anim.rotate)
@@ -365,5 +379,43 @@ class BebasExpiredFragment : Fragment() {
             Log.e("BebasExpiredFragment", "loadingAnimation belum diinisialisasi")
         }
     }
+
+    private fun setupTouchListener() {
+        scrollView.setOnTouchListener(object : View.OnTouchListener {
+            private var startY = 0f
+            private var isPullingDown = false
+
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                if (event != null) {
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            startY = event.y
+                            isPullingDown = false
+                        }
+                        MotionEvent.ACTION_MOVE -> {
+                            if (!scrollView.canScrollVertically(-1) && event.y > startY) {
+                                isPullingDown = true
+                            }
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            if (isPullingDown) {
+                                Log.d("ScrollView", "berhasil tarik ke atas")
+//                                Toast.makeText(context, "Berhasil tarik ke atas", Toast.LENGTH_SHORT).show()
+                                fetchDataFromAPIDasboardList()
+                                displaySavedResponseD()
+                                startLoadingAnimation()
+                                // Stop the animation after a delay (e.g., 2 seconds)
+                                scrollView.postDelayed({
+                                    stopLoadingAnimation()
+                                }, 2000)
+                            }
+                        }
+                    }
+                }
+                return false
+            }
+        })
+    }
+
 
 }
