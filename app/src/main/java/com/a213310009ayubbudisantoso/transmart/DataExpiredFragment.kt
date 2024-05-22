@@ -21,7 +21,6 @@ import com.google.gson.JsonObject
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -104,8 +103,10 @@ class DataExpiredFragment : Fragment() {
                 } else {
                     // Jika input tidak kosong, kirim ke API
                     val inBarcode = s.toString()
-                    val inStoreCode = "10011"
-                    sendBarcodeToAPI(inBarcode, inStoreCode)
+                    val inStoreCode = userstorecode
+                    if (inStoreCode != null) {
+                        sendBarcodeToAPI(inBarcode, inStoreCode)
+                    }
                 }
             }
         })
@@ -135,7 +136,7 @@ class DataExpiredFragment : Fragment() {
         tglEditText.addTextChangedListener(textWatcher)
         jumEditText.addTextChangedListener(textWatcher)
 
-        displaySavedResponse()
+        displaySavedResponseUser()
     }
 
     private fun scanner() {
@@ -273,28 +274,58 @@ class DataExpiredFragment : Fragment() {
     }
 
     //   local stored
-    private fun displaySavedResponse() {
+//    private fun displaySavedResponse() {
+//        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+//        val responseJson = sharedPreferences.getString("response_json", "")
+//        Log.d("ini hit responseJson", "${responseJson}")
+//
+//        if (!responseJson.isNullOrEmpty()) {
+//            try {
+//                val jsonObject = JSONObject(responseJson)
+//                val userObject = jsonObject.getJSONObject("user")
+//                val userName = userObject.getString("name")
+//                val userId = userObject.getString("nik")
+//                val storecode = userObject.getString("locationCode")
+//                // Ambil nilai 'name' untuk 'createBy'
+//                createBy = userName
+//                idCreateBy = userId
+//                userstorecode = storecode
+//
+//            } catch (e: JSONException) {
+//                e.printStackTrace()
+//            }
+//        }
+//    }
+
+
+    private fun displaySavedResponseUser() {
         val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
         val responseJson = sharedPreferences.getString("response_json", "")
-        Log.d("ini hit responseJson", "${responseJson}")
+        Log.d("ResponseJson", "$responseJson")
 
         if (!responseJson.isNullOrEmpty()) {
             try {
                 val jsonObject = JSONObject(responseJson)
-                val userObject = jsonObject.getJSONObject("user")
-                val userName = userObject.getString("name")
-                val userId = userObject.getString("nik")
-                val storecode = userObject.getString("locationCode")
-                // Ambil nilai 'name' untuk 'createBy'
-                createBy = userName
-                idCreateBy = userId
-                userstorecode = storecode
 
-            } catch (e: JSONException) {
-                e.printStackTrace()
+                // Extracting values from the JSON object
+                val apiData = jsonObject.getJSONObject("apiData")
+                val user = apiData.getJSONObject("user")
+                val dbDataArray = jsonObject.getJSONArray("dbData")
+                val dbData = if (dbDataArray.length() > 0) dbDataArray.getJSONObject(0) else null
+
+                createBy = user.optString("name", "Unknown name")
+                idCreateBy = user.optString("nik", "Unknown nik")
+                userstorecode = dbData?.optString("usp_store", "Unknown Store") ?: "Unknown Store"
+
+                Log.d("ResponseJson", "createBy: $createBy, idCreateBy: $idCreateBy userstorecode: $userstorecode")
+            } catch (e: Exception) {
+                Log.e("ResponseJson", "Error parsing response string", e)
             }
+        } else {
+            Log.d("ResponseJson", "No response data found")
         }
     }
+
 
     private fun sendBarcodeToAPI(barcode: String, storeCode: String) {
         // Inisialisasi Retrofit

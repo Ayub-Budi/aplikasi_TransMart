@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".BebasExpiredFragment">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,9 +32,23 @@
                 android:paddingStart="10dp"/>
         </LinearLayout>
 
+
+        <!-- Loading Animation ImageView -->
+        <ImageView
+            android:id="@+id/loadingAnimation"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top|center_horizontal"
+            android:visibility="gone"
+            android:src="@drawable/loading" /> <!-- Ganti dengan animasi loading Anda -->
+
+
+
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@+id/scrollViewD">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -66,12 +81,12 @@
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
-                                android:src="@drawable/expired" />
+                                android:src="@drawable/note_add" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppinssemibold"
-                                android:text="Mendata Expire" />
+                                android:text="Pendataan Expire" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -93,12 +108,12 @@
                             <ImageView
                                 android:layout_width="40dp"
                                 android:layout_height="40dp"
-                                android:src="@drawable/expired" />
+                                android:src="@drawable/withdraw" />
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/poppinssemibold"
-                                android:text="Menarik Barang" />
+                                android:text="Penarikan Barang" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
                 </LinearLayout>
@@ -109,6 +124,7 @@
                     android:orientation="vertical"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp">
+
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -162,7 +178,8 @@
                                             android:layout_height="wrap_content"
                                             android:text="0"
                                             android:fontFamily="@font/poppinssemibold"
-                                            android:textSize="20dp"/>
+                                            android:textSize="20dp"
+                                            android:id="@+id/diDataId"/>
                                     </LinearLayout>
 
                                     <LinearLayout
@@ -182,7 +199,8 @@
                                             android:layout_height="wrap_content"
                                             android:text="0"
                                             android:fontFamily="@font/poppinssemibold"
-                                            android:textSize="20dp"/>
+                                            android:textSize="20dp"
+                                            android:id="@+id/diTarikId"/>
                                     </LinearLayout>
 
                                 </LinearLayout>
@@ -221,32 +239,43 @@
                             android:padding="10dp"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Expired"
-                                android:fontFamily="@font/poppinsbold"
-                                android:textSize="16dp"
-                                android:textColor="@color/blackColor"/>
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
 
+                                <TextView
+                                    android:id="@+id/textExpired"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Expired"
+                                    android:fontFamily="@font/poppinsbold"
+                                    android:textSize="16sp"
+                                    android:textColor="@color/blackColor"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/showMore"
+                                    android:text="Show more"
+                                    android:fontFamily="@font/poppinsregular"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/primaryColor"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_alignParentRight="true"/>
+
+                            </RelativeLayout>
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="10dp"
                                 android:orientation="vertical">
 
-<!--                                <androidx.recyclerview.widget.RecyclerView-->
-<!--                                    android:layout_width="match_parent"-->
-<!--                                    android:layout_height="match_parent"-->
-<!--                                    android:id="@+id/dExpired"/>-->
-
                                 <androidx.recyclerview.widget.RecyclerView
                                     android:id="@+id/dExpired"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                                    tools:listitem="@layout/item_barang" />
-
+                                    tools:listitem="@layout/dasboard_item_list" />
                             </LinearLayout>
 
 
@@ -258,12 +287,8 @@
 
             </LinearLayout>
 
-
-
         </ScrollView>
 
     </LinearLayout>
-
-
 
 </FrameLayout>

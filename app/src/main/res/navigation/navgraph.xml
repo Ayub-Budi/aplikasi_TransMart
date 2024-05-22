@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_bebasExpiredFragment_to_tarikBarangFragment"
             app:destination="@id/tarikBarangFragment" />
+        <action
+            android:id="@+id/action_bebasExpiredFragment_to_detailItemFragment"
+            app:destination="@id/detailItemFragment" />
     </fragment>
     <fragment
         android:id="@+id/listFragment"
