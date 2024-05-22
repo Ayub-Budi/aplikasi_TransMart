@@ -2,6 +2,7 @@ package com.a213310009ayubbudisantoso.transmart
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,10 +19,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
@@ -55,6 +53,9 @@ class DetailItemFragment : Fragment() {
     private lateinit var textExpiredDate: TextView
     private lateinit var textItemStatus: TextView
     private lateinit var textItemQty: TextView
+    private lateinit var jumlahDitarik: TextView
+    private lateinit var inputQty: EditText
+
 
     private lateinit var tarik: Button
 
@@ -65,6 +66,17 @@ class DetailItemFragment : Fragment() {
 
     private var barcode: String? = null
     private var idItem: String? = null
+    private var idUser: String? = null
+
+    private var itemName: String? = null
+    private var noGondola: String? = null
+    private var kodeBarang: String? = null
+    private var tanggalExpired: String? = null
+    private var statusItem: String? = null
+    private var jumlahItem: String? = null
+
+    private var resizedBitmap2: Bitmap? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_detail_item, container, false)
@@ -82,6 +94,8 @@ class DetailItemFragment : Fragment() {
         textItemQty = view.findViewById(R.id.jumlahValue)
         hasilFoto = view.findViewById(R.id.hasilFoto)
         tarik = view.findViewById(R.id.tarik)
+        inputQty = view.findViewById(R.id.jum)
+
 
         val cameraButton: CardView = view.findViewById(R.id.camera)
 
@@ -90,16 +104,17 @@ class DetailItemFragment : Fragment() {
         }
 
         tarik.setOnClickListener {
-            kirim()
+            showDataPopup()
         }
 
         kembali = view.findViewById(R.id.kembali)
         kembali.setOnClickListener { requireActivity().onBackPressed() }
 
-        displaySavedResponse()
+        displaySavedResponseitem()
+        displaySavedResponseuser()
     }
 
-    private fun displaySavedResponse() {
+    private fun displaySavedResponseitem() {
         val sharedPreferences = requireContext().getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
         val responseJson = sharedPreferences.getString("item", "")
 
@@ -107,12 +122,12 @@ class DetailItemFragment : Fragment() {
             try {
                 val jsonObject = JSONObject(responseJson)
 
-                val itemName = jsonObject.getString("ie_item_name")
-                val noGondola = jsonObject.getString("ie_gondola_no")
-                val kodeBarang = jsonObject.getString("ie_item_code")
-                val tanggalExpired = jsonObject.getString("ie_expired_date")
-                val statusItem = jsonObject.getString("ie_item_status")
-                val jumlahItem = jsonObject.getInt("ie_qty")
+                itemName = jsonObject.getString("ie_item_name")
+                noGondola = jsonObject.getString("ie_gondola_no")
+                kodeBarang = jsonObject.getString("ie_item_code")
+                tanggalExpired = jsonObject.getString("ie_expired_date")
+                statusItem = jsonObject.getString("ie_item_status")
+                jumlahItem = jsonObject.getInt("ie_qty").toString()
                 idItem = jsonObject.getString("ie_id")
 
                 textNameItem.text = itemName
@@ -130,6 +145,68 @@ class DetailItemFragment : Fragment() {
             }
         }
     }
+
+    private fun displaySavedResponseuser() {
+        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+        val responseJson = sharedPreferences.getString("response_json", "")
+        Log.d("ResponseJson", "$responseJson")
+
+        if (!responseJson.isNullOrEmpty()) {
+            try {
+                val jsonObject = JSONObject(responseJson)
+
+                // Extracting values from the JSON object
+                val apiData = jsonObject.getJSONObject("apiData")
+                val user = apiData.getJSONObject("user")
+                val dbDataArray = jsonObject.getJSONArray("dbData")
+                val dbData = if (dbDataArray.length() > 0) dbDataArray.getJSONObject(0) else null
+
+                idUser = user.optString("nik", "Unknown idUser")
+//                storeUser = dbData?.optString("ms_name", "Unknown Store") ?: "Unknown Store"
+
+                Log.d("ResponseJson", "idUser: $idUser")
+            } catch (e: Exception) {
+                Log.e("ResponseJson", "Error parsing response string", e)
+            }
+        } else {
+            Log.d("ResponseJson", "No response data found")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun showDataPopup() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_data_popup_tarik, null)
+
+        // Set nilai ke TextView di dialogView
+        dialogView.findViewById<TextView>(R.id.noGondalaValue).text = noGondola
+        dialogView.findViewById<TextView>(R.id.kodeBarangValue).text = kodeBarang
+        dialogView.findViewById<TextView>(R.id.tanggalExpiredValue).text = tanggalExpired
+        dialogView.findViewById<TextView>(R.id.namaItemValue).text = itemName
+        dialogView.findViewById<TextView>(R.id.statusItemValue).text = statusItem
+        dialogView.findViewById<TextView>(R.id.jumlahValue).text = jumlahItem
+        dialogView.findViewById<TextView>(R.id.jumlahDitarik).text = inputQty.text.toString()
+        val imageView = dialogView.findViewById<ImageView>(R.id.hasilFotoB)
+
+        resizedBitmap2?.let {
+            imageView.setImageBitmap(it)
+        }
+
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle("Penarikan Barang")
+            .setView(dialogView)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+                kirim()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun checkCameraPermission() {
@@ -197,6 +274,7 @@ class DetailItemFragment : Fragment() {
                 val resizedBitmap = resizeBitmap(originalBitmap, 800, 800) // Resize to desired dimensions
                 hasilFoto.visibility = View.VISIBLE
                 hasilFoto.setImageBitmap(resizedBitmap)
+                resizedBitmap2 = resizedBitmap
                 Log.d("ini hasil nya", "$uri")
                 it.close()
             }
@@ -204,6 +282,23 @@ class DetailItemFragment : Fragment() {
             Log.e("DetailItemFragment", "Error loading image", e)
         }
     }
+
+//    private fun resizeAndSetImage(uri: Uri) {
+//        try {
+//            val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
+//            inputStream?.let {
+//                val originalBitmap = BitmapFactory.decodeStream(it)
+//                resizedBitmap = resizeBitmap(originalBitmap, 800, 800) // Resize to desired dimensions
+//                hasilFoto.visibility = View.VISIBLE
+//                hasilFoto.setImageBitmap(resizedBitmap)
+//                Log.d("ini hasil nya", "$uri")
+//                it.close()
+//            }
+//        } catch (e: Exception) {
+//            Log.e("DetailItemFragment", "Error loading image", e)
+//        }
+//    }
+
 
     private fun resizeBitmap(source: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
         val aspectRatio: Float = source.width.toFloat() / source.height.toFloat()
@@ -270,14 +365,16 @@ class DetailItemFragment : Fragment() {
         val imageFile = createImageFileFromBitmap(bitmap)
 
         val kodeBarang = barcode.toString()
+        val qty = inputQty.text.toString()
         val ie_id = idItem.toString()
+        Log.d("ini adalah qty", "kirim: $qty")
         val requestBody = imageFile?.let {
             MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("image", it.name, it.asRequestBody("image/jpeg".toMediaTypeOrNull()))
                 .addFormDataPart("ie_id", ie_id)
-                .addFormDataPart("ie_update_user", "riduwan")
-                .addFormDataPart("ie_qty_pull", "5")
+                .addFormDataPart("ie_update_user", "$idUser")
+                .addFormDataPart("ie_qty_pull", "$qty")
                 .build()
         }
 
@@ -317,4 +414,6 @@ class DetailItemFragment : Fragment() {
             })
         }
     }
+
+
 }

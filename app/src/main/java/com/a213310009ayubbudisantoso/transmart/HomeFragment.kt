@@ -1,35 +1,25 @@
 package com.a213310009ayubbudisantoso.transmart
 
 import DashboardExpiredModel
-import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.a213310009ayubbudisantoso.transmart.api.model.ClosestItem
-import com.a213310009ayubbudisantoso.transmart.api.model.DashboardData
 import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
 import com.a213310009ayubbudisantoso.transmart.api.services.DasboardEspiredService
-import com.a213310009ayubbudisantoso.transmart.api.services.DasboardItemService
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -66,29 +56,6 @@ class HomeFragment : Fragment() {
             bottomSheet.show(childFragmentManager, bottomSheet.tag)
         }
 
-//        powerOff.setOnClickListener{
-//            // Buat dialog konfirmasi
-//            val builder = AlertDialog.Builder(requireContext())
-//            builder.setTitle("Konfirmasi")
-//            builder.setMessage("Apakah Anda yakin ingin keluar?")
-//
-//            // Tombol untuk mengkonfirmasi
-//            builder.setPositiveButton("Ya") { dialog, _ ->
-//                // Tutup aktivitas
-//                requireActivity().finish()
-//                dialog.dismiss()
-//            }
-//
-//            // Tombol untuk membatalkan
-//            builder.setNegativeButton("Tidak") { dialog, _ ->
-//                dialog.dismiss()
-//            }
-//
-//            // Tampilkan dialog
-//            val dialog = builder.create()
-//            dialog.show()
-//        }
-
         bebasExpired.setOnClickListener{
             findNavController().navigate(R.id.action_homeFragment_to_bebasExpiredFragment)
         }
@@ -97,7 +64,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_listFragment)
         }
 
-        displaySavedResponse()
+        displaySavedResponseUser()
         nameText.text = this.nameUser
         storeText.text = this.storeUser
 
@@ -105,23 +72,32 @@ class HomeFragment : Fragment() {
         fetchDataFromAPIDasboardList()
     }
 
-    private fun displaySavedResponse() {
+    private fun displaySavedResponseUser() {
         val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
         val responseJson = sharedPreferences.getString("response_json", "")
-        Log.d("ResponseJson", responseJson ?: "")
+        Log.d("ResponseJson", "$responseJson")
 
         if (!responseJson.isNullOrEmpty()) {
             try {
                 val jsonObject = JSONObject(responseJson)
-                val userObject = jsonObject.getJSONObject("user")
-                nameUser = userObject.getString("name")
-                storeUser = userObject.getString("locationName")
-            } catch (e: JSONException) {
-                e.printStackTrace()
+
+                // Extracting values from the JSON object
+                val apiData = jsonObject.getJSONObject("apiData")
+                val user = apiData.getJSONObject("user")
+                val dbDataArray = jsonObject.getJSONArray("dbData")
+                val dbData = if (dbDataArray.length() > 0) dbDataArray.getJSONObject(0) else null
+
+                nameUser = user.optString("name", "Unknown User")
+                storeUser = dbData?.optString("ms_name", "Unknown Store") ?: "Unknown Store"
+
+                Log.d("ResponseJson", "Name: $nameUser, Store: $storeUser")
+            } catch (e: Exception) {
+                Log.e("ResponseJson", "Error parsing response string", e)
             }
+        } else {
+            Log.d("ResponseJson", "No response data found")
         }
     }
-
     private fun saveDataToSharedPreferences(context: Context, itemList: DashboardResponse?) {
         val sharedPreferences = context.getSharedPreferences("dashboard", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()

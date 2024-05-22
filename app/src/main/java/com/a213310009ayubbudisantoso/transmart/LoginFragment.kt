@@ -11,43 +11,16 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import com.a213310009ayubbudisantoso.transmart.api.model.DbData
+import com.a213310009ayubbudisantoso.transmart.api.model.LoginResponse
+import com.a213310009ayubbudisantoso.transmart.api.services.LoginService
 import com.google.android.material.textfield.TextInputEditText
-import okhttp3.*
-import okhttp3.logging.HttpLoggingInterceptor
-import org.json.JSONObject
-import java.io.IOException
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
-import java.security.cert.X509Certificate
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class LoginFragment : Fragment() {
-
-    private val httpClient: OkHttpClient by lazy {
-        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) = Unit
-            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-        })
-
-        val sslContext = SSLContext.getInstance("SSL")
-        sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-
-        val sslSocketFactory = sslContext.socketFactory
-
-        OkHttpClient.Builder()
-            .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-            .hostnameVerifier { _, _ -> true }
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .build()
-    }
-
-    private fun saveResponseToSharedPreferences(responseJson: String) {
-        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("response_json", responseJson)
-        editor.apply()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,73 +40,105 @@ class LoginFragment : Fragment() {
             val user = username.text.toString()
             val pass = password.text.toString()
 
+
             if (user.isNotEmpty() && pass.isNotEmpty()) {
 
-                val progressDialog = ProgressDialog(context)
-                progressDialog.setMessage("Loading...")
-                progressDialog.setCancelable(false)
-                progressDialog.show()
+                login(user, pass)
 
-                val requestBody = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("username", user)
-                    .addFormDataPart("passwd", pass)
-                    .build()
-
-
-                Log.d("ini hit usr & passwd", "user ${user} & pass ${pass}")
-
-
-                val request = Request.Builder()
-                    .url("https://hrms.transretail.co.id/aso/checklogin.php")
-                    .post(requestBody)
-                    .build()
-
-                Log.d("ini hit api", "${request}")
-
-
-                httpClient.newCall(request).enqueue(object : Callback {
-                    override fun onResponse(call: Call, response: Response) {
-                        val responseBody = response.body?.string() // Baca konten respons
-
-                        progressDialog.dismiss() // Hentikan animasi loading
-
-                        if (response.isSuccessful && responseBody != null) {
-                            val jsonResponse = JSONObject(responseBody)
-                            val error = jsonResponse.getBoolean("error")
-                            if (!error) {
-                                // Gunakan responseBody yang telah dibaca sebelumnya
-                                saveResponseToSharedPreferences(responseBody)
-                                // Jika tidak ada kesalahan, lanjutkan dengan tindakan setelah login berhasil
-                                activity?.runOnUiThread {
-                                    Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
-                                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-                                }
-                            } else {
-                                // Jika ada kesalahan, tampilkan pesan kesalahan dari respons API
-                                val errorMsg = jsonResponse.getString("error_msg")
-                                activity?.runOnUiThread {
-                                    Toast.makeText(context, "Login Failed : $errorMsg", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        } else {
-                            Log.e("API_CALL_ERROR", "Error: ${response.code}")
-                            activity?.runOnUiThread {
-                                Toast.makeText(context, "Gagal login. Kode status: ${response.code}", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-
-                    override fun onFailure(call: Call, e: IOException) {
-                        Log.e("API_CALL_ERROR", "Failed to execute request", e)
-                        activity?.runOnUiThread {
-                            Toast.makeText(context, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                })
             } else {
                 Toast.makeText(context, "Mohon isi username dan password", Toast.LENGTH_SHORT).show()
             }
         }
     }
+    private fun saveResponseToSharedPreferences(responseJson: String) {
+        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("response_json", responseJson.toString())
+        editor.apply()
+    }
+    private fun saveResponseToSharedPreferencesT(responseJson: List<DbData>) {
+        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("dbData", responseJson.toString())
+        editor.apply()
+    }
+    // Assuming this function is within your activity or fragment
+    private fun login(username: String, password: String) {
+        val progressDialog = ProgressDialog(context)
+        progressDialog.setMessage("Loading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+        // Initialize Retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://backend.transmart.co.id/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        // Create service instance
+        val service = retrofit.create(LoginService::class.java)
+
+        // Create request body
+        val jsonObject = JsonObject().apply {
+            addProperty("username", username)
+            addProperty("password", password)
+        }
+
+        Log.d("RequestBody", "$username & $password")
+
+        service.login(jsonObject).enqueue(object : retrofit2.Callback<LoginResponse> {
+            override fun onResponse(call: retrofit2.Call<LoginResponse>, response: retrofit2.Response<LoginResponse>) {
+                if (response.isSuccessful) {
+                    progressDialog.dismiss()
+                    val loginResponse = response.body()
+                    if (loginResponse != null) {
+                        val apiData = loginResponse.apiData
+                        val dbData = loginResponse.dbData
+                        val error = loginResponse.apiData.error
+                        val user = loginResponse.apiData.user
+                        val usp_store = loginResponse.dbData?.get(0)?.usp_store
+
+
+//                        merubah ke jeson
+                        val loginResponseJson = Gson().toJson(loginResponse)
+
+
+                        saveResponseToSharedPreferences(loginResponseJson)
+                        saveResponseToSharedPreferencesT(dbData)
+
+                        if (error == false){
+                            activity?.runOnUiThread {
+                                Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
+                                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                            }
+
+                        }
+
+
+                        Log.d("LoginSuccess", "API Data: $apiData")
+                        Log.d("LoginSuccess", "DB Data: $dbData")
+                        Log.d("LoginSuccess", "DB Data: $error")
+
+                    } else {
+                        Log.e("LoginError", "Response body is null")
+                    }
+
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val errorMessage = errorBody ?: "Unknown error"
+                    Log.e("LoginError", "Error: $errorMessage")
+                    activity?.runOnUiThread {
+                        Toast.makeText(context, "Gagal login. Kode status: $errorMessage", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<LoginResponse>, t: Throwable) {
+                Log.d("API Error", "Failed to send barcode: ${t.message}")
+            }
+        })
+
+    }
+
+
+
 }
