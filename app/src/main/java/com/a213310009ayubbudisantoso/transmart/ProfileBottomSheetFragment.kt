@@ -3,13 +3,13 @@ package com.a213310009ayubbudisantoso.transmart
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import org.json.JSONException
 import org.json.JSONObject
 
 class ProfileBottomSheetFragment : BottomSheetDialogFragment() {
@@ -62,15 +62,22 @@ class ProfileBottomSheetFragment : BottomSheetDialogFragment() {
         if (!responseJson.isNullOrEmpty()) {
             try {
                 val jsonObject = JSONObject(responseJson)
-                val userObject = jsonObject.getJSONObject("user")
-                nameUser = userObject.getString("name")
-                val storeUser = userObject.getString("locationName")
 
-                // Set text for tvProfile
+                // Extracting values from the JSON object
+                val apiData = jsonObject.getJSONObject("apiData")
+                val user = apiData.getJSONObject("user")
+                val dbDataArray = jsonObject.getJSONArray("dbData")
+                val dbData = if (dbDataArray.length() > 0) dbDataArray.getJSONObject(0) else null
+
+                nameUser = user.optString("name", "Unknown User")
                 tvProfile.text = nameUser
-            } catch (e: JSONException) {
-                e.printStackTrace()
+
+                Log.d("ResponseJson", "Name: $nameUser)")
+            } catch (e: Exception) {
+                Log.e("ResponseJson", "Error parsing response string", e)
             }
+        } else {
+            Log.d("ResponseJson", "No response data found")
         }
     }
 }

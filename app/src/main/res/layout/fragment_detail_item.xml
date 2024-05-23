@@ -191,28 +191,6 @@
                             android:paddingStart="5dp"/>
                     </TableRow>
 
-                    <!--                <TableRow-->
-                    <!--                    android:paddingTop="10dp">-->
-                    <!--                    <TextView-->
-                    <!--                        android:layout_width="wrap_content"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:text="Bukti Penarikan"-->
-                    <!--                        android:fontFamily="@font/poppinsregular"/>-->
-
-                    <!--                    <TextView-->
-                    <!--                        android:layout_width="wrap_content"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:text=":"-->
-                    <!--                        android:fontFamily="@font/poppinsregular"/>-->
-
-                    <!--                    <ImageView-->
-                    <!--                        android:layout_width="wrap_content"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:id="@+id/camera"-->
-                    <!--                        android:src="@drawable/camera"-->
-                    <!--                        android:layout_marginStart="5dp"/>-->
-                    <!--                </TableRow>-->
-
                 </TableLayout>
 
                 <LinearLayout
@@ -220,10 +198,12 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+
+
                     <androidx.cardview.widget.CardView
                         android:id="@+id/camera"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
+                        android:layout_height="250dp"
                         android:layout_margin="8dp">
 
                         <LinearLayout
@@ -246,15 +226,17 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:padding="16dp"
-                                android:gravity="center"
-                                android:background="@drawable/background_bukti">
+                                android:gravity="center">
 
                                 <!-- Ikon untuk mengunggah file -->
                                 <ImageView
                                     android:id="@+id/hasilFoto"
-                                    android:layout_width="140dp"
-                                    android:layout_height="190dp"
-                                    android:layout_centerVertical="true"/>
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxWidth="200dp"
+                                    android:maxHeight="100dp"
+                                    android:layout_centerVertical="true"
+                                    android:src="@drawable/background_bukti"/>
                             </LinearLayout>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
@@ -269,9 +251,7 @@
                     android:textColor="@color/white"
                     android:text="Tarik Barang"/>
             </LinearLayout>
-
         </ScrollView>
-
 
     </LinearLayout>
 </FrameLayout>

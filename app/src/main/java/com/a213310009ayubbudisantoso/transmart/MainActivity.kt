@@ -28,6 +28,12 @@ class MainActivity : AppCompatActivity() {
                     Handler(Looper.getMainLooper()).postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
                 }
             }
+            R.id.bebasExpiredFragment -> {
+                navController.navigate(R.id.action_bebasExpiredFragment_to_homeFragment)
+            }
+            R.id.tarikBarangFragment -> {
+                navController.navigate(R.id.action_tarikBarangFragment_to_bebasExpiredFragment)
+            }
             R.id.homeFragment -> {
                 moveTaskToBack(true)
             }
