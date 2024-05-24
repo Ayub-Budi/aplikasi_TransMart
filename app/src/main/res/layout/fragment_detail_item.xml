@@ -246,9 +246,9 @@
                     android:id="@+id/tarik"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_shape"
+                    android:background="@drawable/button_shape_grey"
                     android:layout_marginTop="20dp"
-                    android:textColor="@color/white"
+                    android:textColor="@color/darkGrey"
                     android:text="Tarik Barang"/>
             </LinearLayout>
         </ScrollView>

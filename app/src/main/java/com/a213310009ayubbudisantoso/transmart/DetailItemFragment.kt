@@ -15,6 +15,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -96,6 +98,7 @@ class DetailItemFragment : Fragment() {
         tarik = view.findViewById(R.id.tarik)
         inputQty = view.findViewById(R.id.jum)
 
+        validateInputs()
 
         val cameraButton: CardView = view.findViewById(R.id.camera)
 
@@ -275,6 +278,7 @@ class DetailItemFragment : Fragment() {
                 hasilFoto.visibility = View.VISIBLE
                 hasilFoto.setImageBitmap(resizedBitmap)
                 resizedBitmap2 = resizedBitmap
+                validateInputs()
                 Log.d("ini hasil nya", "$uri")
                 it.close()
             }
@@ -415,5 +419,49 @@ class DetailItemFragment : Fragment() {
         }
     }
 
+    private fun validateInputs() {
+
+        fun checkInputs() {
+            val isQtyFilled = inputQty.text.toString().isNotEmpty()
+            val isImageTaken = resizedBitmap2 != null
+
+            tarik.isEnabled = isQtyFilled && isImageTaken
+
+            // Atur status tombol dan warna latar belakang
+            if (isQtyFilled && isImageTaken) {
+                tarik.isEnabled = true
+                tarik.setBackgroundResource(R.drawable.button_shape)
+                tarik.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            } else {
+                tarik.isEnabled = false
+                tarik.setBackgroundResource(R.drawable.button_shape_grey)
+                tarik.setTextColor(ContextCompat.getColor(requireContext(), R.color.darkGrey))
+            }
+
+            Log.d("tess", "checkInputs: $isImageTaken")
+            Log.d("tess", "checkInputs: $isQtyFilled")
+        }
+
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                checkInputs()
+            }
+        }
+
+        inputQty.addTextChangedListener(textWatcher)
+
+
+
+        checkInputs()
+
+        fun setImage(bitmap: Bitmap?) {
+            resizedBitmap2 = bitmap
+            checkInputs()
+        }
+    }
 
 }
