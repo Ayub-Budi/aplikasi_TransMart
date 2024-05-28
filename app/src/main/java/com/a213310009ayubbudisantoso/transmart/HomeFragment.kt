@@ -1,7 +1,14 @@
 package com.a213310009ayubbudisantoso.transmart
 
 import DashboardExpiredModel
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +17,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
@@ -32,6 +43,10 @@ class HomeFragment : Fragment() {
     private var nameUser: String? = null
     private var storeUser: String? = null
 
+    private val CHANNEL_ID = "example_channel"
+    private val notificationId = 101
+    private val REQUEST_CODE_POST_NOTIFICATIONS = 1
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,10 +60,9 @@ class HomeFragment : Fragment() {
         val bebasExpired = view.findViewById<CardView>(R.id.expired)
         val listBarang = view.findViewById<CardView>(R.id.listBarang)
 
-        //perbaiki
+        // Perbaiki
         val nameText = view.findViewById<TextView>(R.id.name)
         val storeText = view.findViewById<TextView>(R.id.storeName)
-
 
         val buttonShowBottomSheet = view.findViewById<ImageView>(R.id.buttonShowBottomSheet)
         buttonShowBottomSheet.setOnClickListener {
@@ -56,11 +70,11 @@ class HomeFragment : Fragment() {
             bottomSheet.show(childFragmentManager, bottomSheet.tag)
         }
 
-        bebasExpired.setOnClickListener{
+        bebasExpired.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_bebasExpiredFragment)
         }
 
-        listBarang.setOnClickListener{
+        listBarang.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_listFragment)
         }
 
@@ -68,8 +82,14 @@ class HomeFragment : Fragment() {
         nameText.text = this.nameUser
         storeText.text = this.storeUser
 
-        fetchDataFromAPIDashboardModel()
-        fetchDataFromAPIDasboardList()
+        createNotificationChannel()
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE_POST_NOTIFICATIONS)
+        } else {
+            fetchDataFromAPIDashboardModel()
+            fetchDataFromAPIDasboardList()
+        }
     }
 
     private fun displaySavedResponseUser() {
@@ -98,13 +118,19 @@ class HomeFragment : Fragment() {
             Log.d("ResponseJson", "No response data found")
         }
     }
-    private fun saveDataToSharedPreferences(context: Context, itemList: DashboardResponse?) {
-        val sharedPreferences = context.getSharedPreferences("dashboard", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val gson = Gson()
-        val json = gson.toJson(itemList)
-        editor.putString("response_dashboard", json)
-        editor.apply()
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Example Channel"
+            val descriptionText = "This is an example channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     private fun fetchDataFromAPIDashboardModel() {
@@ -140,7 +166,6 @@ class HomeFragment : Fragment() {
         })
     }
 
-
     private fun fetchDataFromAPIDasboardList() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -164,6 +189,7 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
     private fun parseAndLogApiResponse(responseBody: String) {
         val gson = Gson()
         val apiResponse = gson.fromJson(responseBody, DashboardExpiredModel::class.java)
@@ -171,10 +197,60 @@ class HomeFragment : Fragment() {
         Log.d("HomeFragment", "Nearest expiration date: ${apiResponse.nearestExpirationDate}")
         apiResponse.closestItems?.forEach {
             Log.d("HomeFragment", "Item Name: ${it.ieItemName}, Remaining Days: ${it.remainingDays}")
+            //send notif
+            sendNotification("${it.ieItemName} expired dalam ${it.remainingDays} hari lagi", it.hashCode())
         }
     }
 
+    private fun sendNotification(message: String, notificationId: Int) {
+        val intent = Intent(requireContext(), MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(requireContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
+        val vibrationPattern = longArrayOf(0, 500, 1000)
+
+        val builder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+            .setSmallIcon(R.drawable.logo_trans_tools)
+            .setContentTitle("Item Expiring Soon")
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setVibrate(vibrationPattern)
+
+        with(NotificationManagerCompat.from(requireContext())) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            notify(notificationId, builder.build())
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_POST_NOTIFICATIONS) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                fetchDataFromAPIDashboardModel()
+                fetchDataFromAPIDasboardList()
+            } else {
+                // Handle the case where the user denies the permission
+            }
+        }
+    }
+
+    private fun saveDataToSharedPreferences(context: Context, itemList: DashboardResponse?) {
+        val sharedPreferences = context.getSharedPreferences("dashboard", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json = gson.toJson(itemList)
+        editor.putString("response_dashboard", json)
+        editor.apply()
+    }
 
     private fun saveDataToSharedPreferences(context: Context, responseBody: String) {
         val sharedPreferences = context.getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)

@@ -20,6 +20,9 @@ import com.a213310009ayubbudisantoso.transmart.api.services.LoginService
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -28,6 +31,7 @@ class LoginFragment : Fragment() {
     private lateinit var username: TextInputEditText
     private lateinit var password: TextInputEditText
     private lateinit var btnLogin: Button
+    private var progressDialog: ProgressDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,10 +77,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun login(username: String, password: String) {
-        val progressDialog = ProgressDialog(context)
-        progressDialog.setMessage("Loading...")
-        progressDialog.setCancelable(false)
-        progressDialog.show()
+        progressDialog = ProgressDialog(context)
+        progressDialog?.setMessage("Loading...")
+        progressDialog?.setCancelable(false)
+        progressDialog?.show()
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://backend.transmart.co.id/")
@@ -90,17 +94,15 @@ class LoginFragment : Fragment() {
             addProperty("password", password)
         }
 
-        service.login(jsonObject).enqueue(object : retrofit2.Callback<LoginResponse> {
-            override fun onResponse(call: retrofit2.Call<LoginResponse>, response: retrofit2.Response<LoginResponse>) {
+        service.login(jsonObject).enqueue(object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                progressDialog?.dismiss()
                 if (response.isSuccessful) {
-                    progressDialog.dismiss()
                     val loginResponse = response.body()
                     if (loginResponse != null) {
                         val apiData = loginResponse.apiData
                         val dbData = loginResponse.dbData
                         val error = apiData.error
-                        val user = apiData.user
-                        val usp_store = dbData?.get(0)?.usp_store
 
                         val loginResponseJson = Gson().toJson(loginResponse)
                         saveResponseToSharedPreferences(loginResponseJson)
@@ -111,6 +113,8 @@ class LoginFragment : Fragment() {
                                 Toast.makeText(context, "Login berhasil", Toast.LENGTH_SHORT).show()
                                 findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                             }
+                        } else {
+                            Toast.makeText(context, "Gagal login. Terdapat error dari server", Toast.LENGTH_SHORT).show()
                         }
 
                         Log.d("LoginSuccess", "API Data: $apiData")
@@ -123,13 +127,17 @@ class LoginFragment : Fragment() {
                     val errorBody = response.errorBody()?.string() ?: "Unknown error"
                     Log.e("LoginError", "Error: $errorBody")
                     activity?.runOnUiThread {
-                        Toast.makeText(context, "Gagal login. Kode status: $errorBody", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(context, "Gagal login. Kode status: $errorBody", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Gagal login", Toast.LENGTH_SHORT).show()
+                        progressDialog?.dismiss()
                     }
                 }
             }
 
-            override fun onFailure(call: retrofit2.Call<LoginResponse>, t: Throwable) {
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                progressDialog?.dismiss()
                 Log.d("API Error", "Failed to send barcode: ${t.message}")
+                Toast.makeText(context, "Gagal login. Terjadi kesalahan saat menghubungi server", Toast.LENGTH_SHORT).show()
             }
         })
     }
