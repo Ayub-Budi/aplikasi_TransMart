@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.a213310009ayubbudisantoso.transmart.api.model.BebasExpiredModel
@@ -49,6 +50,8 @@ class DataExpiredFragment : Fragment() {
     private lateinit var calendar: Calendar
     private lateinit var kembali: ImageView
 
+    private lateinit var simpanButton : Button
+
     private lateinit var apiService: BebasExpiredService
 
     override fun onCreateView(
@@ -83,6 +86,8 @@ class DataExpiredFragment : Fragment() {
         btnScan = view.findViewById(R.id.btnScan)
         btnScanGondala = view.findViewById(R.id.btnScanGondala)
 
+        simpanButton  = view.findViewById(R.id.simpan)
+
         // Button listeners
         btnScan.setOnClickListener { scanner() }
         btnScanGondala.setOnClickListener { scanner2() }
@@ -98,8 +103,8 @@ class DataExpiredFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.isNullOrEmpty()) {
-                    itmEditText.text = "data not yet available"
-                    statusEditText.text = "data not yet available"
+                    itmEditText.text = "Data not yet available"
+                    statusEditText.text = "Data not yet available"
                 } else {
                     // Jika input tidak kosong, kirim ke API
                     val inBarcode = s.toString()
@@ -108,33 +113,11 @@ class DataExpiredFragment : Fragment() {
                         sendBarcodeToAPI(inBarcode, inStoreCode)
                     }
                 }
+                validateInputs()
             }
         })
 
-        // Save button click listener
-        val simpanButton: Button = view.findViewById(R.id.simpan)
-        simpanButton.setOnClickListener { simpan() }
-        simpanButton.isEnabled = false
-
-        val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                val allFieldsNotEmpty = noGondalaEditText.text.isNotEmpty() &&
-                        kodeEditText.text.isNotEmpty() &&
-                        tglEditText.text.isNotEmpty() &&
-                        jumEditText.text.isNotEmpty()
-
-                simpanButton.isEnabled = allFieldsNotEmpty
-            }
-        }
-
-        noGondalaEditText.addTextChangedListener(textWatcher)
-        kodeEditText.addTextChangedListener(textWatcher)
-        tglEditText.addTextChangedListener(textWatcher)
-        jumEditText.addTextChangedListener(textWatcher)
+        validateInputs()
 
         displaySavedResponseUser()
     }
@@ -232,6 +215,8 @@ class DataExpiredFragment : Fragment() {
 
 
                 }
+
+                validateInputs()
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
@@ -249,6 +234,7 @@ class DataExpiredFragment : Fragment() {
         itmEditText.setText("Data not yet available")
         statusEditText.setText("Data not yet available")
         jumEditText.setText("")
+        validateInputs()
     }
 
     private fun showDatePickerDialog() {
@@ -366,12 +352,61 @@ class DataExpiredFragment : Fragment() {
                     itmEditText.setText("Data not yet available")
                     statusEditText.setText("Data not yet available")
                 }
+
+                validateInputs()
             }
 
             override fun onFailure(call: Call<ItemResponse>, t: Throwable) {
                 Log.d("API Error", "Failed to send barcode: ${t.message}")
             }
         })
+    }
+
+    private fun validateInputs(){
+        // Save button click listener
+        simpanButton.setOnClickListener { simpan() }
+        simpanButton.isEnabled = false
+
+        fun checkInputs(){
+            val itmText = itmEditText.text.toString()
+            val statusText = statusEditText.text.toString()
+
+            val additionalConditionsMet = itmText != "Data not yet available" &&
+                    statusText != "Data not yet available"
+            val allFieldsNotEmpty = noGondalaEditText.text.isNotEmpty() &&
+                    kodeEditText.text.isNotEmpty() &&
+                    tglEditText.text.isNotEmpty() &&
+                    jumEditText.text.isNotEmpty()
+
+            // Atur status tombol dan warna latar belakang
+            if (allFieldsNotEmpty && additionalConditionsMet) {
+                simpanButton.isEnabled = true
+                simpanButton.setBackgroundResource(R.drawable.button_shape)
+                simpanButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            } else {
+                simpanButton.isEnabled = false
+                simpanButton.setBackgroundResource(R.drawable.button_shape_grey)
+                simpanButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.darkGrey))
+            }
+        }
+
+        checkInputs()
+
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                checkInputs()
+            }
+
+        }
+
+        noGondalaEditText.addTextChangedListener(textWatcher)
+        kodeEditText.addTextChangedListener(textWatcher)
+        tglEditText.addTextChangedListener(textWatcher)
+        jumEditText.addTextChangedListener(textWatcher)
     }
 
 }
