@@ -40,6 +40,7 @@ class ProfileBottomSheetFragment : BottomSheetDialogFragment() {
                 // Tutup aktivitas
                 findNavController().navigate(R.id.loginFragment)
                 dialog.dismiss()
+                clearSession()
             }
 
             // Tombol untuk membatalkan
@@ -80,4 +81,15 @@ class ProfileBottomSheetFragment : BottomSheetDialogFragment() {
             Log.d("ResponseJson", "No response data found")
         }
     }
+    fun clearSession() {
+        val sharedPreferences = context?.getSharedPreferences("MySession", Context.MODE_PRIVATE)
+        val editor = sharedPreferences?.edit()
+        if (editor != null) {
+            editor.clear()
+        }
+        if (editor != null) {
+            editor.apply()
+        }
+    }
+
 }

@@ -56,6 +56,9 @@ class BebasExpiredFragment : Fragment() {
     private lateinit var scrollView: ScrollView
     private lateinit var loadingAnimation: ImageView
 
+    private var nik: String? = null
+
+
 
 
     override fun onCreateView(
@@ -88,10 +91,9 @@ class BebasExpiredFragment : Fragment() {
 //        })
         setupTouchListener()
 
-
-        fetchDataFromAPIDashboardModel()
-
+        displaySavedResponseUser()
         fetchDataFromAPIListExpired()
+        fetchDataFromAPIDashboardModel()
 
         displaySavedResponse()
 
@@ -145,6 +147,11 @@ class BebasExpiredFragment : Fragment() {
     }
 
     private fun fetchDataFromAPIListExpired() {
+
+        val uspUser = nik.toString()
+        Log.d("coba ini", "$nik ")
+        displaySavedResponseUser()
+
         val retrofit = Retrofit.Builder()
             .baseUrl("https://backend.transmart.co.id/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -152,25 +159,24 @@ class BebasExpiredFragment : Fragment() {
 
         val apiService = retrofit.create(TarikBarangService::class.java)
 
-        apiService.getListExpired().enqueue(object : Callback<List<TarikBarangModel>> {
+        apiService.getListExpired(uspUser).enqueue(object : Callback<List<TarikBarangModel>> {
             override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
                 if (response.isSuccessful) {
                     val itemList = response.body()
                     itemList?.let {
+                        // Simpan data ke shared preferences setelah menerimanya
                         saveDataToSharedPreferences(requireContext(), it)
-                        Log.e("TarikBarangFragment", "Dendapatkan data: ${it}")
-
+                        Log.d("DataListExpierd", "Dapatkan data: $it")
                     }
-
                 } else {
                     // Tangani kesalahan jika respons tidak berhasil
-                    Log.e("TarikBarangFragment", "Gagal mendapatkan data: ${response.message()}")
+                    Log.e("DataListExpierd", "Gagal mendapatkan data: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<List<TarikBarangModel>>, t: Throwable) {
-                // Tangani kesalahan koneksi atau respons gagal
-                Log.e("TarikBarangFragment", "Error: ${t.message}")
+                // Tangani kesalahan saat koneksi gagal
+                Log.e("DataListExpierd", "Error: ${t.message}")
             }
         })
     }
@@ -182,8 +188,11 @@ class BebasExpiredFragment : Fragment() {
             .build()
 
         val apiService = retrofit.create(DasboardEspiredService::class.java)
+        val uspUser = nik.toString()
 
-        apiService.getDashboardData().enqueue(object : Callback<DashboardResponse> {
+        Log.d("DasboardEspired", "$nik ")
+
+        apiService.getDashboardData(uspUser).enqueue(object : Callback<DashboardResponse> {
             override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
                 if (response.isSuccessful) {
                     val dashboardResponse = response.body()
@@ -194,23 +203,20 @@ class BebasExpiredFragment : Fragment() {
                     val radiusAFromAPI = dataListed?.itemListedToday?.toFloatOrNull() ?: 0f
                     val radiusBFromAPI = dataWithdrawn?.itemWithdrawnToday?.toFloatOrNull() ?: 0f
 
-
                     // Tetapkan nilai radiusA dan radiusB dari API ke variabel yang sudah dideklarasikan sebelumnya
                     didata = radiusAFromAPI
                     ditarik = radiusBFromAPI
 
-                    didataText.text = dataListed?.itemListedToday
-                    ditarikText.text = dataWithdrawn?.itemWithdrawnToday
-
+                    didataText.text = dataListed?.itemListedToday ?: "0"
+                    ditarikText.text = dataWithdrawn?.itemWithdrawnToday ?: "0"
 
                     val radiusA = didata // Variabel untuk radius
                     val radiusB = ditarik // Variabel untuk radius
 
                     drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
 
-
-                    Log.d("DashboardData", "didata: ${didata}")
-                    Log.d("DashboardData", "ditarik: ${ditarik}")
+                    Log.d("DashboardData", "didata: $didata")
+                    Log.d("DashboardData", "ditarik: $ditarik")
 
                     // Lakukan sesuatu dengan data yang diterima
                     Log.d("DashboardData", "Item listed today: ${dataListed?.itemListedToday}")
@@ -218,13 +224,56 @@ class BebasExpiredFragment : Fragment() {
                     Log.d("DashboardData", "Item withdrawn today: ${dataWithdrawn?.itemWithdrawnToday}")
                     Log.d("DashboardData", "Total items withdrawn: ${dataWithdrawn?.totalItemsWithdrawn}")
                 } else {
-                    Log.e("BebasExpiredFragment", "Error: ${response.message()}")
+                    Log.e("DasboardEspired", "Error: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<DashboardResponse>, t: Throwable) {
                 // Tangani kesalahan koneksi atau respons gagal
-                Log.e("BebasExpiredFragment", "Error: ${t.message}")
+                Log.e("DasboardEspired", "Error: ${t.message}")
+            }
+        })
+
+
+        apiService.getDashboardData(uspUser).enqueue(object : Callback<DashboardResponse> {
+            override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
+                if (response.isSuccessful) {
+                    val dashboardResponse = response.body()
+                    val dataListed = dashboardResponse?.dataListed
+                    val dataWithdrawn = dashboardResponse?.dataWithdrawn
+
+                    // Ambil nilai radiusA dan radiusB dari respons API
+                    val radiusAFromAPI = dataListed?.itemListedToday?.toFloatOrNull() ?: 0f
+                    val radiusBFromAPI = dataWithdrawn?.itemWithdrawnToday?.toFloatOrNull() ?: 0f
+
+                    // Tetapkan nilai radiusA dan radiusB dari API ke variabel yang sudah dideklarasikan sebelumnya
+                    didata = radiusAFromAPI
+                    ditarik = radiusBFromAPI
+
+                    didataText.text = dataListed?.itemListedToday ?: "0"
+                    ditarikText.text = dataWithdrawn?.itemWithdrawnToday ?: "0"
+
+                    val radiusA = didata // Variabel untuk radius
+                    val radiusB = ditarik // Variabel untuk radius
+
+                    drawPieChart(listOf(radiusA, radiusB), listOf(Color.BLUE, Color.GREEN))
+
+                    Log.d("DashboardData", "didata: $didata")
+                    Log.d("DashboardData", "ditarik: $ditarik")
+
+                    // Lakukan sesuatu dengan data yang diterima
+                    Log.d("DashboardData", "Item listed today: ${dataListed?.itemListedToday}")
+                    Log.d("DashboardData", "Total items listed: ${dataListed?.totalItemsListed}")
+                    Log.d("DashboardData", "Item withdrawn today: ${dataWithdrawn?.itemWithdrawnToday}")
+                    Log.d("DashboardData", "Total items withdrawn: ${dataWithdrawn?.totalItemsWithdrawn}")
+                } else {
+                    Log.e("DasboardEspired", "Error: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<DashboardResponse>, t: Throwable) {
+                // Tangani kesalahan koneksi atau respons gagal
+                Log.e("DasboardEspired", "Error: ${t.message}")
             }
         })
     }
@@ -306,7 +355,7 @@ class BebasExpiredFragment : Fragment() {
     private fun fetchDataFromAPIDasboardList() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = "https://backend.transmart.co.id/apiMobile/dashboard-expiringSoon"
+                val url = "https://backend.transmart.co.id/apiMobile/dashboard-expiringSoon?usp_user=$nik"
                 val client = OkHttpClient()
                 val request = Request.Builder().url(url).build()
                 client.newCall(request).execute().use { response ->
@@ -416,6 +465,37 @@ class BebasExpiredFragment : Fragment() {
             }
         })
     }
+
+    private fun displaySavedResponseUser() {
+        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+        val responseJson = sharedPreferences.getString("response_json", "")
+        Log.d("ResponseJson", "$responseJson")
+
+        if (!responseJson.isNullOrEmpty()) {
+            try {
+                val jsonObject = JSONObject(responseJson)
+
+                // Extracting values from the JSON object
+                val apiData = jsonObject.getJSONObject("apiData")
+                val user = apiData.getJSONObject("user")
+                val dbDataArray = jsonObject.getJSONArray("dbData")
+                val dbData = if (dbDataArray.length() > 0) dbDataArray.getJSONObject(0) else null
+
+//                nameUser = user.optString("name", "Unknown User")
+                nik = user.optString("nik", "Unknown User")
+//                uspStore = dbData?.optString("usp_store", "Unknown Store") ?: "Unknown Store"
+
+
+                Log.d("ResponseJson", "uspUser: $nik" +
+                        "")
+            } catch (e: Exception) {
+                Log.e("ResponseJson", "Error parsing response string", e)
+            }
+        } else {
+            Log.d("ResponseJson", "No response data found")
+        }
+    }
+
 
 
 }

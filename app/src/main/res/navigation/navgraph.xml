@@ -67,6 +67,9 @@
         android:name="com.a213310009ayubbudisantoso.transmart.TarikBarangFragment"
         android:label="fragment_tarik_barang"
         tools:layout="@layout/fragment_tarik_barang" >
+        <deepLink
+            android:id="@+id/deepLinkToTarikBarang"
+            app:uri="myapp://tarikBarangFragment" />
         <action
             android:id="@+id/action_tarikBarangFragment_to_bebasExpiredFragment"
             app:destination="@id/bebasExpiredFragment" />

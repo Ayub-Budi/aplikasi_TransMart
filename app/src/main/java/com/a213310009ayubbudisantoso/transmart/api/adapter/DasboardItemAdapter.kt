@@ -54,14 +54,14 @@ class DasboardItemAdapter(private var itemList: List<ClosestItem>) :
         private val hariTextView: TextView = itemView.findViewById(R.id.hari)
         private val nameTextView: TextView = itemView.findViewById(R.id.name)
         private val tanggalTextView: TextView = itemView.findViewById(R.id.tanggal)
-        private val jumlahTextView: TextView = itemView.findViewById(R.id.jumlah)
+        private val noGondalaTextView: TextView = itemView.findViewById(R.id.noGondola)
         private val statusTextView: TextView = itemView.findViewById(R.id.statusItem)
 
         @RequiresApi(Build.VERSION_CODES.N)
         fun bind(item: ClosestItem) {
             hariTextView.text = item.remainingDays.toString()
             nameTextView.text = item.ieItemName
-            jumlahTextView.text = item.ieQty.toString()
+            noGondalaTextView.text = item.ieGondolaNo
             statusTextView.text = item.ieItemStatus
 
             // Format tanggal sesuai dengan "yyyy/MM/dd"

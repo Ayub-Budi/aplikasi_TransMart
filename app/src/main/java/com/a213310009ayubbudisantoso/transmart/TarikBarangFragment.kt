@@ -21,6 +21,7 @@ import com.a213310009ayubbudisantoso.transmart.api.model.TarikBarangModel
 import com.a213310009ayubbudisantoso.transmart.api.services.TarikBarangService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,6 +36,8 @@ class TarikBarangFragment : Fragment() {
 //    private lateinit var scrollView: NestedScrollView
     private lateinit var scrollView: RecyclerView
     private lateinit var loadingAnimation: ImageView
+
+    private var nik: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -230,29 +233,64 @@ class TarikBarangFragment : Fragment() {
             .build()
 
         val apiService = retrofit.create(TarikBarangService::class.java)
+        displaySavedResponseUser()
 
-        apiService.getListExpired().enqueue(object : Callback<List<TarikBarangModel>> {
+        val uspUser = nik.toString()
+
+        apiService.getListExpired(uspUser).enqueue(object : Callback<List<TarikBarangModel>> {
             override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
                 if (response.isSuccessful) {
                     val itemList = response.body()
                     itemList?.let {
                         saveDataToSharedPreferences(requireContext(), it)
-                        Log.e("TarikBarangFragment", "Dendapatkan data: ${it}")
+                        Log.d("ListExpired", "Dendapatkan data: ${it}")
 
                     }
 
                 } else {
                     // Tangani kesalahan jika respons tidak berhasil
-                    Log.e("TarikBarangFragment", "Gagal mendapatkan data: ${response.message()}")
+                    Log.e("ListExpired", "Gagal mendapatkan data: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<List<TarikBarangModel>>, t: Throwable) {
-                // Tangani kesalahan koneksi atau respons gagal
-                Log.e("TarikBarangFragment", "Error: ${t.message}")
+                Log.e("YourFragment", "Error: ${t.message}")
             }
         })
+
     }
+
+
+//    private fun fetchDataFromAPIListExpired() {
+//        val retrofit = Retrofit.Builder()
+//            .baseUrl("https://backend.transmart.co.id/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+//
+//        val apiService = retrofit.create(TarikBarangService::class.java)
+//
+//        apiService.getListExpired().enqueue(object : Callback<List<TarikBarangModel>> {
+//            override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
+//                if (response.isSuccessful) {
+//                    val itemList = response.body()
+//                    itemList?.let {
+//                        saveDataToSharedPreferences(requireContext(), it)
+//                        Log.e("TarikBarangFragment", "Dendapatkan data: ${it}")
+//
+//                    }
+//
+//                } else {
+//                    // Tangani kesalahan jika respons tidak berhasil
+//                    Log.e("TarikBarangFragment", "Gagal mendapatkan data: ${response.message()}")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<List<TarikBarangModel>>, t: Throwable) {
+//                // Tangani kesalahan koneksi atau respons gagal
+//                Log.e("TarikBarangFragment", "Error: ${t.message}")
+//            }
+//        })
+//    }
 
 
     fun saveDataToSharedPreferences(context: Context, itemList: List<TarikBarangModel>) {
@@ -263,6 +301,35 @@ class TarikBarangFragment : Fragment() {
         editor.putString("listDataExpired", json)
         editor.apply()
     }
+
+    private fun displaySavedResponseUser() {
+        val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
+        val responseJson = sharedPreferences.getString("response_json", "")
+        Log.d("ResponseJson", "$responseJson")
+
+        if (!responseJson.isNullOrEmpty()) {
+            try {
+                val jsonObject = JSONObject(responseJson)
+
+                // Extracting values from the JSON object
+                val apiData = jsonObject.getJSONObject("apiData")
+                val user = apiData.getJSONObject("user")
+                val dbDataArray = jsonObject.getJSONArray("dbData")
+                val dbData = if (dbDataArray.length() > 0) dbDataArray.getJSONObject(0) else null
+
+//                nameUser = user.optString("name", "Unknown User")
+                nik = user.optString("nik", "Unknown User")
+//                nik = dbData?.optString("nik", "Unknown Store") ?: "Unknown Store"
+
+                Log.d("ResponseJson", "uspUser: $nik")
+            } catch (e: Exception) {
+                Log.e("ResponseJson", "Error parsing response string", e)
+            }
+        } else {
+            Log.d("ResponseJson", "No response data found")
+        }
+    }
+
 
 
 }

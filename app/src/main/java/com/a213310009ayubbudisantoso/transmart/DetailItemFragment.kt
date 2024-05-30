@@ -41,6 +41,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.security.cert.X509Certificate
+import java.text.ParseException
 import java.util.*
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
@@ -117,6 +118,7 @@ class DetailItemFragment : Fragment() {
         displaySavedResponseuser()
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun displaySavedResponseitem() {
         val sharedPreferences = requireContext().getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
         val responseJson = sharedPreferences.getString("item", "")
@@ -133,10 +135,22 @@ class DetailItemFragment : Fragment() {
                 jumlahItem = jsonObject.getInt("ie_qty").toString()
                 idItem = jsonObject.getString("ie_id")
 
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd")
+                val outputFormat = SimpleDateFormat("yyyy/MM/dd")
+                try {
+                    val date = inputFormat.parse(tanggalExpired)
+                    val formattedDate = outputFormat.format(date)
+                    textExpiredDate.text = formattedDate
+                } catch (e: ParseException) {
+                    e.printStackTrace()
+                    // Handle jika terjadi kesalahan parsing tanggal
+                }
+
+
                 textNameItem.text = itemName
                 textNoGondala.text = noGondola
                 textItemCode.text = kodeBarang
-                textExpiredDate.text = tanggalExpired
+//                textExpiredDate.text = tanggalExpired
                 textItemStatus.text = statusItem
                 textItemQty.text = jumlahItem.toString()
 

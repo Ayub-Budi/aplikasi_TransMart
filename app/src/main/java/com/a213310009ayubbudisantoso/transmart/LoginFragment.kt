@@ -103,6 +103,9 @@ class LoginFragment : Fragment() {
                         val apiData = loginResponse.apiData
                         val dbData = loginResponse.dbData
                         val error = apiData.error
+                        val user = loginResponse.apiData.user.nik
+
+                        saveSession(user)
 
                         val loginResponseJson = Gson().toJson(loginResponse)
                         saveResponseToSharedPreferences(loginResponseJson)
@@ -168,5 +171,16 @@ class LoginFragment : Fragment() {
         btnLogin.isEnabled = allFieldsNotEmpty
         btnLogin.setBackgroundResource(if (allFieldsNotEmpty) R.drawable.button_shape else R.drawable.button_shape_grey)
         btnLogin.setTextColor(ContextCompat.getColor(requireContext(), if (allFieldsNotEmpty) R.color.white else R.color.darkGrey))
+    }
+
+    fun saveSession(userId: String) {
+        val sharedPreferences = context?.getSharedPreferences("MySession", Context.MODE_PRIVATE)
+        val editor = sharedPreferences?.edit()
+        if (editor != null) {
+            editor.putString("userId", userId)
+        }
+        if (editor != null) {
+            editor.apply()
+        }
     }
 }

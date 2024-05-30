@@ -52,7 +52,7 @@ class TarikBarangAdapter(private var itemList: List<TarikBarangModel>) :
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nameTextView: TextView = itemView.findViewById(R.id.name)
         private val tanggalTextView: TextView = itemView.findViewById(R.id.tanggal)
-        private val jumlahTextView: TextView = itemView.findViewById(R.id.jumlah)
+        private val noGondolaTextView: TextView = itemView.findViewById(R.id.noGondola)
         private val statusTextView: TextView = itemView.findViewById(R.id.statusItem)
         private val hari: TextView = itemView.findViewById(R.id.hari)
 
@@ -60,7 +60,7 @@ class TarikBarangAdapter(private var itemList: List<TarikBarangModel>) :
         fun bind(item: TarikBarangModel) {
             nameTextView.text = item.ieItemName
             hari.text = item.remainingDays.toString()
-            jumlahTextView.text = item.ieQty.toString()
+            noGondolaTextView.text = item.ieGondolaNo.toString()
             statusTextView.text = item.ieItemStatus
 //            statusTextView.text = if (item.ieItemStatus == "y") "returnable" else "non-returnable"
 

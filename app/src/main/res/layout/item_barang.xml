@@ -177,11 +177,11 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppinssemibold"
                         android:textColor="@color/blackColor"
-                        android:text="Jumlah"
+                        android:text="No Gondola"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"/>
                     <TextView
-                        android:id="@+id/jumlah"
+                        android:id="@+id/noGondola"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppinssemibold"
