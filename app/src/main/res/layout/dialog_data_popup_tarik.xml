@@ -18,141 +18,139 @@
 
             <TableRow>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:text="No Gondala"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text=":"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
                     android:id="@+id/noGondalaValue"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:fontFamily="@font/poppinsregular"/>
             </TableRow>
 
             <TableRow>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:text="Kode Barang"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text=":"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
                     android:id="@+id/kodeBarangValue"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:fontFamily="@font/poppinsregular"/>
             </TableRow>
 
             <TableRow>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:text="Tanggal Expired"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text=":"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
                     android:id="@+id/tanggalExpiredValue"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:fontFamily="@font/poppinsregular"/>
             </TableRow>
 
             <TableRow>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:text="Nama Item"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text=":"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
                     android:id="@+id/namaItemValue"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:fontFamily="@font/poppinsregular"/>
             </TableRow>
 
             <TableRow>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:text="Status Item"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text=":"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
                     android:id="@+id/statusItemValue"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:fontFamily="@font/poppinsregular"/>
             </TableRow>
 
             <TableRow>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Jumlah"
-                    android:fontFamily="@font/poppinsregular"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=":"
-                    android:fontFamily="@font/poppinsregular"/>
-
-                <TextView
-                    android:id="@+id/jumlahValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppinsregular"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:text="Jumlah Ditarik"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text=":"
                     android:fontFamily="@font/poppinsregular"/>
 
                 <TextView
                     android:id="@+id/jumlahDitarik"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="4"
                     android:fontFamily="@font/poppinsregular"/>
             </TableRow>
 
@@ -175,7 +173,6 @@
                 android:layout_width="100dp"
                 android:layout_height="140dp"
                 android:layout_centerVertical="true"/>
-
 
         </LinearLayout>
 

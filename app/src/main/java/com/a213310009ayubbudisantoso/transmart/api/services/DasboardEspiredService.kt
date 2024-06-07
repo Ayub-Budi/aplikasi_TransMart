@@ -7,8 +7,10 @@ import retrofit2.http.Query
 
 interface DasboardEspiredService {
     @GET("/apiMobile/dashboard-didata")
-    fun getDashboardData(@Query("usp_user") uspUser: String): Call<DashboardResponse>
-//    fun getDashboardData(@Query("usp_user") uspUser: String): Call<List<DashboardResponse>>
-
+    fun getDashboardData(
+        @Query("usp_user") uspUser: String,
+        @Query("usp_dept") uspDept: String
+    ): Call<DashboardResponse>
+    // fun getDashboardData(@Query("usp_user") uspUser: String): Call<List<DashboardResponse>>
 }
 

@@ -8,7 +8,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -23,9 +22,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.fragment.findNavController
 import com.a213310009ayubbudisantoso.transmart.api.model.DashboardResponse
+import com.a213310009ayubbudisantoso.transmart.api.model.ItemNotifyModel
 import com.a213310009ayubbudisantoso.transmart.api.model.StoreNotifyModel
 import com.a213310009ayubbudisantoso.transmart.api.service.NotifyService
 import com.a213310009ayubbudisantoso.transmart.api.services.DasboardEspiredService
@@ -47,7 +46,9 @@ class HomeFragment : Fragment() {
 
     private var nameUser: String? = null
     private var storeUser: String? = null
+    private var deptName: String? = null
     private var nik: String? = null
+    private var usp_dept: String? = null
 
 
     private val CHANNEL_ID = "example_channel"
@@ -119,13 +120,15 @@ class HomeFragment : Fragment() {
 
                 nameUser = user.optString("name", "Unknown User")
                 nik = user.optString("nik", "Unknown User")
-                storeUser = dbData?.optString("ms_name", "Unknown Store") ?: "Unknown Store"
+                usp_dept = dbData?.optString("usp_dept", "Unknown User")
+                deptName = dbData?.optString("dept_name", "Unknown User")
+                storeUser = dbData?.optString("store_name", "Unknown Store") ?: "Unknown Store"
 
                 val uspUser = nik.toString()
 
                 checkSession(uspUser)
 
-                Log.d("ResponseJson", "Name: $nameUser, Store: $storeUser")
+                Log.d("ResponseJson", "Name: $nameUser, Store: $storeUser, usp_dept: $usp_dept, storeUser: $deptName")
             } catch (e: Exception) {
                 Log.e("ResponseJson", "Error parsing response string", e)
             }
@@ -157,8 +160,9 @@ class HomeFragment : Fragment() {
         val apiService = retrofit.create(DasboardEspiredService::class.java)
 
         val uspUser = nik.toString()
+        val dpt = usp_dept.toString()
 
-        apiService.getDashboardData(uspUser).enqueue(object : Callback<DashboardResponse> {
+        apiService.getDashboardData(uspUser,dpt).enqueue(object : Callback<DashboardResponse> {
             override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
                 if (response.isSuccessful) {
                     val dashboardResponse = response.body()
@@ -186,7 +190,7 @@ class HomeFragment : Fragment() {
     private fun fetchDataFromAPIDasboardList() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = "https://backend.transmart.co.id/apiMobile/dashboard-expiringSoon?usp_user=$nik"
+                val url = "https://backend.transmart.co.id/apiMobile/dashboard-expiringSoon?usp_user=$nik&usp_dept=$usp_dept"
                 val client = OkHttpClient()
                 val request = Request.Builder().url(url).build()
                 client.newCall(request).execute().use { response ->
@@ -238,7 +242,8 @@ class HomeFragment : Fragment() {
                         stores.forEach { store ->
                             store.items.forEach { item ->
                                 Log.d("notifyResponse ini", "${item.wording} ")
-                                sendNotification(item.wording, item.hashCode())
+//                                sendNotification(item.wording, item.hashCode())
+                                sendNotification(item, item.hashCode())
                             }
                         }
                     }
@@ -300,10 +305,14 @@ class HomeFragment : Fragment() {
 //    }
 
 
-    private fun sendNotification(message: String, notificationId: Int) {
+    private fun sendNotification(message: ItemNotifyModel, notificationId: Int) {
         val intent = Intent(requireContext(), MainActivity::class.java).apply {
+            Log.d("Ini Notif", "$message")
+//            saveDataToSharedPreferences(requireContext(), "$message")
+            val item = message.toString()
+            saveDataToSharedPreferencesNotif(requireContext(), item)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("EXTRA_NOTIFICATION_MESSAGE", message)
+            putExtra("EXTRA_NOTIFICATION_MESSAGE", message.wording)
             action = "OPEN_TARIK_BARANG_FRAGMENT" // Menambahkan tindakan khusus untuk membuka fragment
         }
 
@@ -314,7 +323,7 @@ class HomeFragment : Fragment() {
         val builder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
             .setSmallIcon(R.drawable.logo_trans_tools)
             .setContentTitle("Item Expiring Soon")
-            .setContentText(message)
+            .setContentText(message.wording)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
@@ -356,9 +365,18 @@ class HomeFragment : Fragment() {
     private fun saveDataToSharedPreferences(context: Context, responseBody: String) {
         val sharedPreferences = context.getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
+//        val gson = Gson()
+//        val json = gson.toJson(responseBody)
         editor.putString("itemDasboardList", responseBody)
         editor.apply()
     }
+    private fun saveDataToSharedPreferencesNotif(context: Context, responseBody: String) {
+        val sharedPreferences = context.getSharedPreferences("notif", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("itemNotifList", responseBody)  // Simpan responseBody langsung
+        editor.apply()
+    }
+
 
     fun checkSession(nik: String): Boolean {
         val sharedPreferences = context?.getSharedPreferences("MySession", Context.MODE_PRIVATE)

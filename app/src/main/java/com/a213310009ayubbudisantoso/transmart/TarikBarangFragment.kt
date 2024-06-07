@@ -38,6 +38,7 @@ class TarikBarangFragment : Fragment() {
     private lateinit var loadingAnimation: ImageView
 
     private var nik: String? = null
+    private var usp_dept: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,15 +77,6 @@ class TarikBarangFragment : Fragment() {
         recyclerView.adapter = adapter
 
         displaySavedResponse()
-        // Load data dari penyimpanan lokal
-//        val itemList = loadDataFromSharedPreferences(requireContext())
-//        itemList?.let {
-//            adapter.setData(it)
-//        }
-
-//        fetchDataFromAPI()
-
-
 
     }
 
@@ -106,54 +98,6 @@ class TarikBarangFragment : Fragment() {
             Log.d("displaySavedResponse", "Tidak ada data yang tersimpan")
         }
     }
-
-//    private fun fetchDataFromAPI() {
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl("https://backend.transmart.co.id/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//
-//        val apiService = retrofit.create(TarikBarangService::class.java)
-//
-//        apiService.getListExpired().enqueue(object : Callback<List<TarikBarangModel>> {
-//            override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
-//                if (response.isSuccessful) {
-//                    val itemList = response.body()
-//                    itemList?.let {
-//                        adapter.setData(it)
-//                        saveDataToSharedPreferences(requireContext(), it)
-//                    }
-//
-//                } else {
-//                    // Tangani kesalahan jika respons tidak berhasil
-//                    Log.e("TarikBarangFragment", "Gagal mendapatkan data: ${response.message()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<List<TarikBarangModel>>, t: Throwable) {
-//                // Tangani kesalahan koneksi atau respons gagal
-//                Log.e("TarikBarangFragment", "Error: ${t.message}")
-//            }
-//        })
-//    }
-
-//    fun saveDataToSharedPreferences(context: Context, itemList: List<TarikBarangModel>) {
-//        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        val gson = Gson()
-//        val json = gson.toJson(itemList)
-//        editor.putString("listDataExpired", json)
-//        editor.apply()
-//    }
-//
-//    fun loadDataFromSharedPreferences(context: Context): List<TarikBarangModel>? {
-//        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-//        val gson = Gson()
-//        val json = sharedPreferences.getString("listDataExpired", null)
-//        val type = object : TypeToken<List<TarikBarangModel>>() {}.type
-//        return gson.fromJson(json, type)
-//    }
-
     private fun setupTouchListener() {
         scrollView.setOnTouchListener(object : View.OnTouchListener {
             private var startY = 0f
@@ -236,8 +180,9 @@ class TarikBarangFragment : Fragment() {
         displaySavedResponseUser()
 
         val uspUser = nik.toString()
+        val dpt = usp_dept.toString()
 
-        apiService.getListExpired(uspUser).enqueue(object : Callback<List<TarikBarangModel>> {
+        apiService.getListExpired(uspUser, dpt).enqueue(object : Callback<List<TarikBarangModel>> {
             override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
                 if (response.isSuccessful) {
                     val itemList = response.body()
@@ -257,42 +202,7 @@ class TarikBarangFragment : Fragment() {
                 Log.e("YourFragment", "Error: ${t.message}")
             }
         })
-
     }
-
-
-//    private fun fetchDataFromAPIListExpired() {
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl("https://backend.transmart.co.id/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//
-//        val apiService = retrofit.create(TarikBarangService::class.java)
-//
-//        apiService.getListExpired().enqueue(object : Callback<List<TarikBarangModel>> {
-//            override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
-//                if (response.isSuccessful) {
-//                    val itemList = response.body()
-//                    itemList?.let {
-//                        saveDataToSharedPreferences(requireContext(), it)
-//                        Log.e("TarikBarangFragment", "Dendapatkan data: ${it}")
-//
-//                    }
-//
-//                } else {
-//                    // Tangani kesalahan jika respons tidak berhasil
-//                    Log.e("TarikBarangFragment", "Gagal mendapatkan data: ${response.message()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<List<TarikBarangModel>>, t: Throwable) {
-//                // Tangani kesalahan koneksi atau respons gagal
-//                Log.e("TarikBarangFragment", "Error: ${t.message}")
-//            }
-//        })
-//    }
-
-
     fun saveDataToSharedPreferences(context: Context, itemList: List<TarikBarangModel>) {
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -319,6 +229,7 @@ class TarikBarangFragment : Fragment() {
 
 //                nameUser = user.optString("name", "Unknown User")
                 nik = user.optString("nik", "Unknown User")
+                usp_dept = dbData?.optString("nik", "Unknown User")
 //                nik = dbData?.optString("nik", "Unknown Store") ?: "Unknown Store"
 
                 Log.d("ResponseJson", "uspUser: $nik")
@@ -329,7 +240,5 @@ class TarikBarangFragment : Fragment() {
             Log.d("ResponseJson", "No response data found")
         }
     }
-
-
 
 }

@@ -76,6 +76,9 @@
         <action
             android:id="@+id/action_tarikBarangFragment_to_detailItemFragment"
             app:destination="@id/detailItemFragment" />
+        <action
+            android:id="@+id/action_tarikBarangFragment_to_detailItemNotifFragment"
+            app:destination="@id/detailItemNotifFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailItemFragment"
@@ -84,6 +87,15 @@
         tools:layout="@layout/fragment_detail_item" >
         <action
             android:id="@+id/action_detailItemFragment_to_tarikBarangFragment"
+            app:destination="@id/tarikBarangFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailItemNotifFragment"
+        android:name="com.a213310009ayubbudisantoso.transmart.DetailItemNotifFragment"
+        android:label="fragment_detail_item_notif"
+        tools:layout="@layout/fragment_detail_item_notif" >
+        <action
+            android:id="@+id/action_detailItemNotifFragment_to_tarikBarangFragment"
             app:destination="@id/tarikBarangFragment" />
     </fragment>
 </navigation>

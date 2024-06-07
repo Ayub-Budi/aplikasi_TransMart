@@ -57,6 +57,7 @@ class BebasExpiredFragment : Fragment() {
     private lateinit var loadingAnimation: ImageView
 
     private var nik: String? = null
+    private var usp_dept: String? = null
 
 
 
@@ -149,6 +150,7 @@ class BebasExpiredFragment : Fragment() {
     private fun fetchDataFromAPIListExpired() {
 
         val uspUser = nik.toString()
+        val dpt = usp_dept.toString()
         Log.d("coba ini", "$nik ")
         displaySavedResponseUser()
 
@@ -159,7 +161,7 @@ class BebasExpiredFragment : Fragment() {
 
         val apiService = retrofit.create(TarikBarangService::class.java)
 
-        apiService.getListExpired(uspUser).enqueue(object : Callback<List<TarikBarangModel>> {
+        apiService.getListExpired(uspUser, dpt).enqueue(object : Callback<List<TarikBarangModel>> {
             override fun onResponse(call: Call<List<TarikBarangModel>>, response: Response<List<TarikBarangModel>>) {
                 if (response.isSuccessful) {
                     val itemList = response.body()
@@ -189,10 +191,11 @@ class BebasExpiredFragment : Fragment() {
 
         val apiService = retrofit.create(DasboardEspiredService::class.java)
         val uspUser = nik.toString()
+        val dpt = usp_dept.toString()
 
         Log.d("DasboardEspired", "$nik ")
 
-        apiService.getDashboardData(uspUser).enqueue(object : Callback<DashboardResponse> {
+        apiService.getDashboardData(uspUser, dpt).enqueue(object : Callback<DashboardResponse> {
             override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
                 if (response.isSuccessful) {
                     val dashboardResponse = response.body()
@@ -235,7 +238,7 @@ class BebasExpiredFragment : Fragment() {
         })
 
 
-        apiService.getDashboardData(uspUser).enqueue(object : Callback<DashboardResponse> {
+        apiService.getDashboardData(uspUser, dpt).enqueue(object : Callback<DashboardResponse> {
             override fun onResponse(call: Call<DashboardResponse>, response: Response<DashboardResponse>) {
                 if (response.isSuccessful) {
                     val dashboardResponse = response.body()
@@ -355,7 +358,7 @@ class BebasExpiredFragment : Fragment() {
     private fun fetchDataFromAPIDasboardList() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = "https://backend.transmart.co.id/apiMobile/dashboard-expiringSoon?usp_user=$nik"
+                val url = "https://backend.transmart.co.id/apiMobile/dashboard-expiringSoon?usp_user=$nik&usp_dept=$usp_dept"
                 val client = OkHttpClient()
                 val request = Request.Builder().url(url).build()
                 client.newCall(request).execute().use { response ->
@@ -483,6 +486,7 @@ class BebasExpiredFragment : Fragment() {
 
 //                nameUser = user.optString("name", "Unknown User")
                 nik = user.optString("nik", "Unknown User")
+                usp_dept = dbData?.optString("usp_dept", "Unknown User")
 //                uspStore = dbData?.optString("usp_store", "Unknown Store") ?: "Unknown Store"
 
 

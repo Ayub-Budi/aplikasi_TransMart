@@ -30,10 +30,14 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.a213310009ayubbudisantoso.transmart.api.model.ItemNotifyModel
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
@@ -47,7 +51,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-class DetailItemFragment : Fragment() {
+class DetailItemNotifFragment : Fragment() {
 
     private lateinit var kembali: ImageView
     private lateinit var textNameItem: TextView
@@ -55,22 +59,17 @@ class DetailItemFragment : Fragment() {
     private lateinit var textItemCode: TextView
     private lateinit var textExpiredDate: TextView
     private lateinit var textItemStatus: TextView
-    private lateinit var textItemQty: TextView
+//    private lateinit var textItemQty: TextView
     private lateinit var jumlahDitarik: TextView
     private lateinit var inputQty: EditText
-
-
     private lateinit var tarik: Button
-
     private val CAMERA_PERMISSION_CODE = 100
     private val CAMERA_REQUEST_CODE = 101
     private lateinit var imageUri: Uri
     private lateinit var hasilFoto: ImageView
-
     private var barcode: String? = null
     private var idItem: String? = null
     private var idUser: String? = null
-
     private var itemName: String? = null
     private var noGondola: String? = null
     private var kodeBarang: String? = null
@@ -82,7 +81,7 @@ class DetailItemFragment : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_detail_item, container, false)
+        return inflater.inflate(R.layout.fragment_detail_item_notif, container, false)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -112,55 +111,89 @@ class DetailItemFragment : Fragment() {
         }
 
         kembali = view.findViewById(R.id.kembali)
-        kembali.setOnClickListener { requireActivity().onBackPressed() }
-
+        kembali.setOnClickListener {
+            findNavController().navigate(R.id.action_detailItemNotifFragment_to_tarikBarangFragment)
+        }
         displaySavedResponseitem()
         displaySavedResponseuser()
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun displaySavedResponseitem() {
-        val sharedPreferences = requireContext().getSharedPreferences("my_shared_preferences", Context.MODE_PRIVATE)
-        val responseJson = sharedPreferences.getString("item", "")
+        val sharedPreferences = requireContext().getSharedPreferences("notif", Context.MODE_PRIVATE)
+        val responseJson = sharedPreferences.getString("itemNotifList", "")
+
+        Log.d("responseJsonNotif", responseJson ?: "")
 
         if (!responseJson.isNullOrEmpty()) {
             try {
-                val jsonObject = JSONObject(responseJson)
+                // Gunakan regex untuk mengekstrak itemName dari string
+                val itemNameRegex = "itemName=([^,]+)".toRegex()
+                val matchResult = itemNameRegex.find(responseJson)
 
-                itemName = jsonObject.getString("ie_item_name")
-                noGondola = jsonObject.getString("ie_gondola_no")
-                kodeBarang = jsonObject.getString("ie_item_code")
-                tanggalExpired = jsonObject.getString("ie_expired_date")
-                statusItem = jsonObject.getString("ie_item_status")
-//                jumlahItem = jsonObject.getInt("ie_qty").toString()
-                idItem = jsonObject.getString("ie_id")
+                if (matchResult != null) {
+                    itemName = matchResult.groupValues[1]
+                    textNameItem.text = itemName
+                    Log.d("ResponseJson", "itemName: $itemName")
+                } else {
+                    Log.e("ResponseJson", "itemName tidak ditemukan dalam responseJson")
+                }
 
-                val inputFormat = SimpleDateFormat("yyyy-MM-dd")
-                val outputFormat = SimpleDateFormat("yyyy/MM/dd")
-                try {
+                // Jika Anda perlu mengekstrak field lain, gunakan regex serupa untuk masing-masing field
+                val gondolaNoRegex = "gondolaNo=([^,]+)".toRegex()
+                val gondolaNoResult = gondolaNoRegex.find(responseJson)
+                noGondola = gondolaNoResult?.groupValues?.get(1)
+                textNoGondala.text = noGondola
+
+                val itemCodeRegex = "itemCode=([^,]+)".toRegex()
+                val itemCodeResult = itemCodeRegex.find(responseJson)
+                kodeBarang = itemCodeResult?.groupValues?.get(1)
+                textItemCode.text = kodeBarang
+
+                val expirationDateRegex = "expirationDate=([^,]+)".toRegex()
+                val expirationDateResult = expirationDateRegex.find(responseJson)
+                tanggalExpired = expirationDateResult?.groupValues?.get(1)
+
+                // Format tanggal
+                if (tanggalExpired != null) {
+                    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val outputFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
                     val date = inputFormat.parse(tanggalExpired)
                     val formattedDate = outputFormat.format(date)
                     textExpiredDate.text = formattedDate
-                } catch (e: ParseException) {
-                    e.printStackTrace()
-                    // Handle jika terjadi kesalahan parsing tanggal
                 }
-                textNameItem.text = itemName
-                textNoGondala.text = noGondola
-                textItemCode.text = kodeBarang
-//                textExpiredDate.text = tanggalExpired
-                textItemStatus.text = statusItem
-//                textItemQty.text = jumlahItem.toString()
 
-                barcode = kodeBarang
 
-                Log.d("ResponseJson", "$itemName & $noGondola & $tanggalExpired & $statusItem ")
-            } catch (e: JSONException) {
+                // Gunakan regex untuk mengekstrak itemName dari string
+                val itemstatusRegex = "status=([^,]+)".toRegex()
+                val statusResult = itemstatusRegex.find(responseJson)
+
+                if (statusResult != null) {
+                    statusItem = statusResult.groupValues[1]
+                    textItemStatus.text = statusItem
+                    Log.d("ResponseJson", "statusItem: $statusItem")
+                } else {
+                    Log.e("ResponseJson", "statusItem tidak ditemukan dalam responseJson")
+                }
+
+                val itemidItemRegex = "ieId=([^,]+)".toRegex()
+                val idItemResult = itemidItemRegex.find(responseJson)
+
+                if (idItemResult != null) {
+                    idItem = idItemResult.groupValues[1]
+//                    idItem = statusItem
+                    Log.d("ResponseJson", "idItem: $idItem")
+                } else {
+                    Log.e("ResponseJson", "statusItem tidak ditemukan dalam responseJson")
+                }
+
+                // Field lainnya dapat diekstraksi dan ditampilkan dengan cara yang serupa
+
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
-
     private fun displaySavedResponseuser() {
         val sharedPreferences = requireContext().getSharedPreferences("response_data", Context.MODE_PRIVATE)
         val responseJson = sharedPreferences.getString("response_json", "")
@@ -299,6 +332,23 @@ class DetailItemFragment : Fragment() {
         }
     }
 
+//    private fun resizeAndSetImage(uri: Uri) {
+//        try {
+//            val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
+//            inputStream?.let {
+//                val originalBitmap = BitmapFactory.decodeStream(it)
+//                resizedBitmap = resizeBitmap(originalBitmap, 800, 800) // Resize to desired dimensions
+//                hasilFoto.visibility = View.VISIBLE
+//                hasilFoto.setImageBitmap(resizedBitmap)
+//                Log.d("ini hasil nya", "$uri")
+//                it.close()
+//            }
+//        } catch (e: Exception) {
+//            Log.e("DetailItemFragment", "Error loading image", e)
+//        }
+//    }
+
+
     private fun resizeBitmap(source: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
         val aspectRatio: Float = source.width.toFloat() / source.height.toFloat()
         val width: Int
@@ -367,6 +417,7 @@ class DetailItemFragment : Fragment() {
         val qty = inputQty.text.toString()
         val ie_id = idItem.toString()
         Log.d("ini adalah qty", "kirim: $qty")
+        Log.d("ini adalah ie_id", "kirim: $ie_id")
         val requestBody = imageFile?.let {
             MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -393,7 +444,7 @@ class DetailItemFragment : Fragment() {
                     if (response.isSuccessful && responseBody != null) {
                         activity?.runOnUiThread {
                             Toast.makeText(context, "Berhasil", Toast.LENGTH_SHORT).show()
-                            findNavController().navigate(R.id.action_detailItemFragment_to_tarikBarangFragment)
+                            findNavController().navigate(R.id.action_detailItemNotifFragment_to_tarikBarangFragment)
                             Log.d("berhasil nih", "berhasil upload")
                         }
                     } else {
@@ -415,11 +466,13 @@ class DetailItemFragment : Fragment() {
     }
 
     private fun validateInputs() {
+
         fun checkInputs() {
             val isQtyFilled = inputQty.text.toString().isNotEmpty()
             val isImageTaken = resizedBitmap2 != null
 
             tarik.isEnabled = isQtyFilled && isImageTaken
+
             // Atur status tombol dan warna latar belakang
             if (isQtyFilled && isImageTaken) {
                 tarik.isEnabled = true
@@ -446,6 +499,8 @@ class DetailItemFragment : Fragment() {
         }
 
         inputQty.addTextChangedListener(textWatcher)
+
+
 
         checkInputs()
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "697415857617",
+    "project_id": "tri-saber-notification",
+    "storage_bucket": "tri-saber-notification.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697415857617:android:7270b8083dec393baa1cf0",
+        "android_client_info": {
+          "package_name": "com.a213310009ayubbudisantoso.transmart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2Tf1tbf2ejciIL7t69IZzwUJd0uGwyts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
